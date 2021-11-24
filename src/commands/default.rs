@@ -10,12 +10,16 @@ use crate::utils::skim::skim;
 
 pub fn default(username: Option<String>) -> Result<()> {
     let cache_file = home::home_dir().unwrap().join(".beam/cache/nodes.json");
-    let metadata = cache_file.metadata()?;
+
+    let is_cache_file_old = if cache_file.exists() {
+        let metadata = cache_file.metadata()?;
+        metadata.modified()?.elapsed()? > Duration::from_secs(60 * 60 * 24)
+    } else {
+        true
+    };
 
     let nodes: Vec<Node>;
-    if !std::path::Path::new(&cache_file).exists()
-        || metadata.modified()?.elapsed()? > Duration::from_secs(60 * 60 * 24)
-    {
+    if !std::path::Path::new(&cache_file).exists() || is_cache_file_old {
         let spinner = utils::spinner::get_spinner();
         spinner.set_message("Getting nodes from teleport...");
         nodes = get_nodes_from_tsh()?;
