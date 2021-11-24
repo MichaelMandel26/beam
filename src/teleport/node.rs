@@ -84,6 +84,7 @@ impl Node {
         label_string.push_str(&key);
         label_string.push_str(":");
         label_string.push_str(&value);
+        label_string.push_str(" ");
     }
 
     let string = format!("{} {}", self.spec.hostname.pad_to_width_with_alignment(30, pad::Alignment::Left), label_string);
