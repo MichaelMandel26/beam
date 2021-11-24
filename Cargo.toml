@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 anyhow = "1.0.47"
 clearscreen = "1.0.7"
+home = "0.5.3"
 indicatif = "0.16.2"
 pad = "0.1.6"
 serde = {version="1.0.130", features=["derive"]}
