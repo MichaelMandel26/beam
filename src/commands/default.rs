@@ -7,7 +7,7 @@ use crate::ssh::connect::connect;
 use crate::teleport::node::Node;
 use crate::utils::skim::skim;
 
-pub fn default() -> Result<()> {
+pub fn default(username: Option<String>) -> Result<()> {
     let pb = ProgressBar::new_spinner();
     pb.enable_steady_tick(80);
     pb.set_style(
@@ -29,7 +29,8 @@ pub fn default() -> Result<()> {
     let selected_item = skim(items)?;
 
     let host = selected_item.split(' ').next().unwrap();
-    let username = whoami::username();
+
+    let username = username.unwrap_or_else(whoami::username);
 
     clearscreen::clear()?;
     connect(host.to_string(), username)?;
