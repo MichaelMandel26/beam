@@ -28,7 +28,7 @@ pub fn default(username: Option<String>) -> Result<()> {
 
     let selected_item = skim(items)?;
 
-    let host = selected_item.split(' ').next().unwrap();
+    let host = selected_item.split(" ").next().unwrap();
 
     let username = username.unwrap_or_else(whoami::username);
 
