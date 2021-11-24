@@ -78,20 +78,25 @@ pub struct Node {
 }
 
 impl Node {
-  pub fn into_skim_string(&self) -> String {
-    let mut label_string = String::new();
-    for (key, value) in &self.metadata.labels {
-        label_string.push_str(&key);
-        label_string.push_str(":");
-        label_string.push_str(&value);
-        label_string.push_str(" ");
+    pub fn into_skim_string(self) -> String {
+        let mut label_string = String::new();
+        for (key, value) in &self.metadata.labels {
+            label_string.push_str(key);
+            label_string.push(':');
+            label_string.push_str(value);
+            label_string.push(' ');
+        }
+
+        let string = format!(
+            "{} {}",
+            self.spec
+                .hostname
+                .pad_to_width_with_alignment(30, pad::Alignment::Left),
+            label_string
+        );
+        string
     }
-
-    let string = format!("{} {}", self.spec.hostname.pad_to_width_with_alignment(30, pad::Alignment::Left), label_string);
-    string
-  }
 }
-
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Metadata {

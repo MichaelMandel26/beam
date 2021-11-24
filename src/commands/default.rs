@@ -1,7 +1,9 @@
 use anyhow::Result;
 use indicatif::{ProgressBar, ProgressStyle};
 use std::process::Command;
+use whoami;
 
+use crate::ssh::connect::connect;
 use crate::teleport::node::Node;
 use crate::utils::skim::skim;
 
@@ -10,8 +12,6 @@ pub fn default() -> Result<()> {
     pb.enable_steady_tick(80);
     pb.set_style(
         ProgressStyle::default_spinner()
-            // For more spinners check out the cli-spinners project:
-            // https://github.com/sindresorhus/cli-spinners/blob/master/spinners.json
             .tick_strings(&["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"])
             .template("{spinner:.blue} {msg}"),
     );
@@ -19,12 +19,20 @@ pub fn default() -> Result<()> {
     pb.set_message("Getting nodes from teleport...");
     let nodes: Vec<Node> = get_nodes_from_tsh()?;
     pb.finish_with_message("Done");
+
     let items = nodes
         .into_iter()
         .map(|node| node.into_skim_string())
         .collect::<Vec<String>>()
         .join("\n");
-    skim(items);
+
+    let selected_item = skim(items)?;
+
+    let host = selected_item.split(' ').next().unwrap();
+    let username = whoami::username();
+
+    clearscreen::clear()?;
+    connect(host.to_string(), username)?;
 
     Ok(())
 }

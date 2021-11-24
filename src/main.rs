@@ -2,14 +2,16 @@ use anyhow::Result;
 use structopt::StructOpt;
 
 mod commands;
+mod ssh;
 mod teleport;
 mod utils;
 
 #[derive(StructOpt, Debug)]
 #[structopt(name = "beam", about = "Easier connection to teleport hosts")]
 struct Beam {
-    #[structopt(long, help = "Toogles verbose mode")]
-    verbose: bool,
+    #[structopt(long, help = "The user which will be used to connect to the host. (default is the current user)")]
+    user: String,
+
     #[structopt(subcommand)]
     cmd: Option<Command>,
 }
