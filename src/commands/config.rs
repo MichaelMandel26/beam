@@ -11,6 +11,8 @@ pub struct Config {
     pub cache_ttl: Option<u64>,
 }
 
+const BEAM_PATH: &str = ".beam/config.toml";
+
 pub fn config(cfg: ConfigOpts) -> Result<()> {
     ensure!(cfg != Default::default(), "No config options specified");
 
@@ -32,7 +34,7 @@ pub fn config(cfg: ConfigOpts) -> Result<()> {
 }
 
 pub fn get_config() -> Result<Option<Config>> {
-    let config_path = home::home_dir().unwrap().join(".beam/config.toml");
+    let config_path = home::home_dir().unwrap().join(BEAM_PATH);
 
     if !config_path.exists() {
         return Ok(None);
@@ -49,7 +51,7 @@ pub fn get_config() -> Result<Option<Config>> {
 
 
 fn write_config(config: Config) -> Result<()> {
-    let config_path = home::home_dir().unwrap().join(".beam/config.toml");
+    let config_path = home::home_dir().unwrap().join(BEAM_PATH);
     let config_str = toml::to_string(&config)?;
     std::fs::write(config_path, config_str)?;    
     Ok(())
