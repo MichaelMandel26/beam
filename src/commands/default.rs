@@ -34,7 +34,12 @@ pub fn default(username: Option<String>) -> Result<()> {
         .collect::<Vec<String>>()
         .join("\n");
 
-    let selected_item = skim(items)?;
+    let selected_item = match skim(items)? {
+        Some(item) => item,
+        None => {
+            return Ok(());
+        }
+    };
 
     let host = selected_item.split(' ').next().unwrap();
 

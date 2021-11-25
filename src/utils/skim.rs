@@ -6,7 +6,7 @@ use skim::{
     Skim,
 };
 
-pub fn skim(items: String) -> Result<String> {
+pub fn skim(items: String) -> Result<Option<String>> {
     let options = SkimOptionsBuilder::default()
         .height(Some("100%"))
         .multi(true)
@@ -17,8 +17,13 @@ pub fn skim(items: String) -> Result<String> {
     let items = item_reader.of_bufread(Cursor::new(items));
 
     let selected_item = Skim::run_with(&options, Some(items))
-        .map(|out| out.selected_items.get(0).unwrap().text().to_string())
-        .unwrap_or_else(|| "".to_string());
-
+        .map(|out| {
+            if !out.is_abort {
+                Some(out.selected_items.get(0).unwrap().text().to_string())
+            } else {
+                None
+            }
+        })
+        .unwrap_or_else(|| None);
     Ok(selected_item)
 }
