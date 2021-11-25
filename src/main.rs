@@ -23,6 +23,15 @@ struct Beam {
 #[derive(StructOpt, Debug)]
 enum Command {
     Connect,
+    Config(ConfigOpts),
+}
+
+#[derive(StructOpt, Debug, PartialEq, Default)]
+pub struct ConfigOpts {
+    #[structopt(short, long, help = "The default username to use")]
+    username: Option<String>,
+    #[structopt(short, long, help = "The TTL for the nodes cache file in seconds")]
+    cache_ttl: Option<u64>,
 }
 
 fn main() -> Result<()> {
@@ -33,6 +42,7 @@ fn main() -> Result<()> {
 
     match beam.cmd {
         Some(Command::Connect) => commands::connect::connect(),
+        Some(Command::Config(cfg)) => commands::config::config(cfg)?,
         None => commands::default::default(user)?,
     }
     Ok(())
