@@ -6,6 +6,7 @@ use whoami;
 use crate::ssh::connect::connect;
 use crate::teleport::node::Node;
 use crate::utils;
+use crate::utils::config::CONFIG;
 use crate::utils::skim::skim;
 
 pub fn default(username: Option<String>) -> Result<()> {
@@ -13,7 +14,8 @@ pub fn default(username: Option<String>) -> Result<()> {
 
     let is_cache_file_old = if cache_file.exists() {
         let metadata = cache_file.metadata()?;
-        metadata.modified()?.elapsed()? > Duration::from_secs(60 * 60 * 24)
+        let ttl = CONFIG.cache_ttl.unwrap_or(60 * 60 * 24);
+        metadata.modified()?.elapsed()? > Duration::from_secs(ttl)
     } else {
         true
     };
@@ -43,7 +45,10 @@ pub fn default(username: Option<String>) -> Result<()> {
 
     let host = selected_item.split(' ').next().unwrap();
 
-    let username = username.unwrap_or_else(whoami::username);
+    let username = match username {
+        Some(username) => username,
+        None => CONFIG.username.clone().unwrap_or_else(whoami::username),
+    };
 
     clearscreen::clear()?;
     connect(host.to_string(), username)?;

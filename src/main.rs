@@ -28,6 +28,8 @@ enum Command {
 
 #[derive(StructOpt, Debug, PartialEq, Default)]
 pub struct ConfigOpts {
+    #[structopt(short, long, help = "Whether to reset the specified configs", conflicts_with_all(&["username", "cache_ttl"]))]
+    reset: bool,
     #[structopt(short, long, help = "The default username to use")]
     username: Option<String>,
     #[structopt(short, long, help = "The TTL for the nodes cache file in seconds")]
