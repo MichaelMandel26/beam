@@ -1,12 +1,28 @@
-use std::collections::HashMap;
-
+use crate::utils;
+use crate::utils::config::CONFIG;
+use anyhow::Result;
 use pad::PadStr;
 use serde::{Deserialize, Serialize};
+use std::time::Duration;
+use std::{collections::HashMap, process::Command};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Node {
     metadata: Metadata,
-    spec: Spec,
+    pub spec: Spec,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Metadata {
+    name: String,
+    labels: HashMap<String, String>,
+    expires: String,
+    id: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Spec {
+    pub hostname: String,
 }
 
 impl Node {
@@ -30,15 +46,53 @@ impl Node {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Metadata {
-    name: String,
-    labels: HashMap<String, String>,
-    expires: String,
-    id: i64,
+pub fn get() -> Result<Vec<Node>> {
+    let cache_file = home::home_dir().unwrap().join(".beam/cache/nodes.json");
+
+    let is_cache_file_old = if cache_file.exists() {
+        let metadata = cache_file.metadata()?;
+        let ttl = CONFIG.cache_ttl.unwrap_or(60 * 60 * 24);
+        metadata.modified()?.elapsed()? > Duration::from_secs(ttl)
+    } else {
+        true
+    };
+
+    let nodes: Vec<Node>;
+    if !std::path::Path::new(&cache_file).exists() || is_cache_file_old {
+        let spinner = utils::spinner::get_spinner();
+        spinner.set_message("Getting nodes from teleport...");
+        nodes = get_from_tsh()?;
+        spinner.finish_with_message("Done");
+    } else {
+        nodes = get_from_cache()?;
+    }
+    Ok(nodes)
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Spec {
-    hostname: String,
+fn get_from_tsh() -> Result<Vec<Node>> {
+    let tsh_list = Command::new("tsh")
+        .args(["ls", "-f", "json"])
+        .output()
+        .expect("failed to execute process");
+    let tsh_json = String::from_utf8_lossy(&tsh_list.stdout);
+    let tsh_nodes: Vec<Node> = serde_json::from_str(&tsh_json)?;
+
+    write_to_cache(tsh_json.to_string())?;
+
+    Ok(tsh_nodes)
+}
+
+fn get_from_cache() -> Result<Vec<Node>> {
+    let cache_path = home::home_dir().unwrap().join(".beam/cache/nodes.json");
+    let cache_json = std::fs::read_to_string(cache_path)?;
+    let cached_nodes: Vec<Node> = serde_json::from_str(&cache_json)?;
+    Ok(cached_nodes)
+}
+
+pub fn write_to_cache(nodes_json: String) -> Result<()> {
+    let cache_dir = home::home_dir().unwrap().join(".beam/cache");
+    std::fs::create_dir_all(&cache_dir)?;
+    let cache_file = cache_dir.join("nodes.json");
+    std::fs::write(cache_file, nodes_json)?;
+    Ok(())
 }

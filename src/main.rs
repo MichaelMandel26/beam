@@ -22,7 +22,7 @@ struct Beam {
 
 #[derive(StructOpt, Debug)]
 enum Command {
-    Connect,
+    Connect(ConnectOpts),
     Config(ConfigOpts),
 }
 
@@ -36,6 +36,12 @@ pub struct ConfigOpts {
     cache_ttl: Option<u64>,
 }
 
+#[derive(StructOpt, Debug, PartialEq, Default)]
+pub struct ConnectOpts {
+    #[structopt(help = "The host to connect to")]
+    host: String,
+}
+
 fn main() -> Result<()> {
     let beam = Beam::from_args();
     let user = beam.user;
@@ -43,10 +49,11 @@ fn main() -> Result<()> {
     check_for_dot_beam_dir()?;
 
     match beam.cmd {
-        Some(Command::Connect) => commands::connect::connect(),
+        Some(Command::Connect(cfg)) => commands::connect::connect(cfg, user)?,
         Some(Command::Config(cfg)) => commands::config::config(cfg)?,
         None => commands::default::default(user)?,
     }
+
     Ok(())
 }
 
