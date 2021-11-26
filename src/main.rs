@@ -45,13 +45,15 @@ pub struct ConnectOpts {
 
 fn main() -> Result<()> {
     let beam = Beam::from_args();
-    let clear_cache = beam.clear_cache;
-    let user = beam.user.clone();
 
     check_for_dot_beam_dir()?;
 
     match beam.cmd {
-        Some(Command::Connect(cfg)) => commands::connect::connect(cfg, user, clear_cache)?,
+        Some(Command::Connect(cfg)) => {
+            let clear_cache = beam.clear_cache;
+            let user = beam.user.clone();
+            commands::connect::connect(cfg, user, clear_cache)?
+        },
         Some(Command::Config(cfg)) => commands::config::config(cfg)?,
         None => commands::default::default(beam)?,
     }
