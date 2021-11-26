@@ -8,14 +8,15 @@ mod utils;
 
 #[derive(StructOpt, Debug)]
 #[structopt(name = "beam", about = "Easier connection to teleport hosts")]
-struct Beam {
+pub struct Beam {
     #[structopt(
         short,
         long,
         help = "The user which will be used to connect to the host. (default is the current system user)"
     )]
     user: Option<String>,
-
+    #[structopt(short, long = "clear-cache", help = "Whether to clear the cache")]
+    clear_cache: bool,
     #[structopt(subcommand)]
     cmd: Option<Command>,
 }
@@ -44,14 +45,15 @@ pub struct ConnectOpts {
 
 fn main() -> Result<()> {
     let beam = Beam::from_args();
-    let user = beam.user;
+    let clear_cache = beam.clear_cache;
+    let user = beam.user.clone();
 
     check_for_dot_beam_dir()?;
 
     match beam.cmd {
-        Some(Command::Connect(cfg)) => commands::connect::connect(cfg, user)?,
+        Some(Command::Connect(cfg)) => commands::connect::connect(cfg, user, clear_cache)?,
         Some(Command::Config(cfg)) => commands::config::config(cfg)?,
-        None => commands::default::default(user)?,
+        None => commands::default::default(beam)?,
     }
 
     Ok(())

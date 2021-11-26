@@ -46,7 +46,7 @@ impl Node {
     }
 }
 
-pub fn get() -> Result<Vec<Node>> {
+pub fn get(use_cache: bool) -> Result<Vec<Node>> {
     let cache_file = home::home_dir().unwrap().join(".beam/cache/nodes.json");
 
     let is_cache_file_old = if cache_file.exists() {
@@ -58,7 +58,7 @@ pub fn get() -> Result<Vec<Node>> {
     };
 
     let nodes: Vec<Node>;
-    if !std::path::Path::new(&cache_file).exists() || is_cache_file_old {
+    if !std::path::Path::new(&cache_file).exists() || is_cache_file_old || !use_cache {
         let spinner = utils::spinner::get_spinner();
         spinner.set_message("Getting nodes from teleport...");
         nodes = get_from_tsh()?;

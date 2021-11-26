@@ -1,13 +1,13 @@
 use anyhow::Result;
 use whoami;
 
-use crate::ssh;
 use crate::teleport::node;
 use crate::utils::config::CONFIG;
 use crate::utils::skim::skim;
+use crate::{ssh, Beam};
 
-pub fn default(username: Option<String>) -> Result<()> {
-    let nodes = node::get()?;
+pub fn default(beam: Beam) -> Result<()> {
+    let nodes = node::get(!beam.clear_cache)?;
 
     let items = nodes
         .into_iter()
@@ -24,7 +24,7 @@ pub fn default(username: Option<String>) -> Result<()> {
 
     let host = selected_item.split(' ').next().unwrap();
 
-    let username = match username {
+    let username = match beam.user {
         Some(username) => username,
         None => CONFIG.username.clone().unwrap_or_else(whoami::username),
     };

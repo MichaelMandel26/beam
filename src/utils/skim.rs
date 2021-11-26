@@ -19,7 +19,9 @@ pub fn skim(items: String) -> Result<Option<String>> {
     let selected_item = Skim::run_with(&options, Some(items))
         .map(|out| {
             if !out.is_abort {
-                Some(out.selected_items.get(0).unwrap().text().to_string())
+                out.selected_items
+                    .first()
+                    .map(|item| item.text().to_string())
             } else {
                 None
             }
