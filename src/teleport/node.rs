@@ -1,12 +1,11 @@
 use crate::teleport::cli;
 use crate::utils;
 use crate::utils::config::CONFIG;
-use anyhow::{Result};
+use anyhow::Result;
 use pad::PadStr;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::time::Duration;
-
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Node {
@@ -49,7 +48,9 @@ impl Node {
 }
 
 pub fn get(use_cache: bool, proxy: String) -> Result<Vec<Node>> {
-    let cache_file = home::home_dir().unwrap().join(format!(".beam/cache/{}.json", proxy));
+    let cache_file = home::home_dir()
+        .unwrap()
+        .join(format!(".beam/cache/{}.json", proxy));
 
     let is_cache_file_old = if cache_file.exists() {
         let metadata = cache_file.metadata()?;
@@ -81,7 +82,9 @@ fn get_from_tsh(proxy: String) -> Result<Vec<Node>> {
 }
 
 fn get_from_cache(proxy: String) -> Result<Vec<Node>> {
-    let cache_path = home::home_dir().unwrap().join(format!(".beam/cache/{}.json", proxy));
+    let cache_path = home::home_dir()
+        .unwrap()
+        .join(format!(".beam/cache/{}.json", proxy));
     let cache_json = std::fs::read_to_string(cache_path)?;
     let cached_nodes: Vec<Node> = serde_json::from_str(&cache_json)?;
     Ok(cached_nodes)

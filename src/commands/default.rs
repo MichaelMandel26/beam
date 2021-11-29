@@ -1,7 +1,7 @@
-use anyhow::{Result, Context};
+use anyhow::{Context, Result};
 use whoami;
 
-use crate::teleport::{node, cli};
+use crate::teleport::{cli, node};
 use crate::utils::config::CONFIG;
 use crate::utils::skim::skim;
 use crate::{ssh, Beam};

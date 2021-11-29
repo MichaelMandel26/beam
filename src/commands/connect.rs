@@ -1,8 +1,8 @@
-use crate::{ssh, teleport::cli};
 use crate::teleport::node;
 use crate::utils::config::CONFIG;
 use crate::ConnectOpts;
-use anyhow::{ensure, Result, Context};
+use crate::{ssh, teleport::cli};
+use anyhow::{ensure, Context, Result};
 
 pub fn connect(cfg: ConnectOpts, user: Option<String>, clear_cache: bool) -> Result<()> {
     let proxy = match cfg.proxy {
