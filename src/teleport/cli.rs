@@ -10,9 +10,9 @@ pub fn is_logged_in() -> Result<bool> {
     Ok(is_logged_in)
 }
 
-pub fn login(proxy: String) -> Result<()> {
+pub fn login(proxy: &str) -> Result<()> {
     Command::new("tsh")
-        .args(["login", "--proxy", proxy.as_str()])
+        .args(["login", "--proxy", proxy])
         .output()?;
     Ok(())
 }

@@ -26,6 +26,10 @@ pub fn config(cfg: ConfigOpts) -> Result<()> {
         config.proxy = Some(proxy);
     }
 
+    if let Some(auth) = cfg.auth {
+        config.auth = Some(auth);
+    }
+
     config.write()?;
 
     println!("Config successfully updated");

@@ -10,9 +10,9 @@ pub fn connect(cfg: ConnectOpts, user: Option<String>, clear_cache: bool) -> Res
         None => CONFIG.proxy.clone().context("No proxy configured to login with. Please use --proxy or configure it with beam config --proxy <url>")?,
     };
     if !cli::is_logged_in()? {
-        cli::login(proxy)?;
+        cli::login(&proxy)?;
     }
-    let nodes = node::get(!clear_cache)?;
+    let nodes = node::get(!clear_cache, proxy)?;
     ensure!(
         nodes.iter().any(|node| node.spec.hostname == cfg.host),
         "Host not found in teleport"

@@ -14,6 +14,7 @@ lazy_static! {
 pub struct Config {
     pub username: Option<String>,
     pub proxy: Option<String>,
+    pub auth: Option<String>,
     pub cache_ttl: Option<u64>,
 }
 

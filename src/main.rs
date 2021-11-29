@@ -37,6 +37,8 @@ pub struct ConfigOpts {
     username: Option<String>,
     #[structopt(short, long, help = "The proxy to use as a default")]
     proxy: Option<String>,
+    #[structopt(short, long, help = "The auth method to use as a default")]
+    auth: Option<String>,
     #[structopt(short, long, help = "The TTL for the nodes cache file in seconds")]
     cache_ttl: Option<u64>,
 }
