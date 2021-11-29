@@ -4,8 +4,13 @@ use crate::ConnectOpts;
 use crate::{ssh, teleport::cli};
 use anyhow::{ensure, Context, Result};
 
-pub fn connect(cfg: ConnectOpts, user: Option<String>, clear_cache: bool) -> Result<()> {
-    let proxy = match cfg.proxy {
+pub fn connect(
+    cfg: ConnectOpts,
+    user: Option<String>,
+    clear_cache: bool,
+    proxy: Option<String>,
+) -> Result<()> {
+    let proxy = match proxy {
         Some(proxy) => proxy,
         None => CONFIG.proxy.clone().context("No proxy configured to login with. Please use --proxy or configure it with beam config --proxy <url>")?,
     };

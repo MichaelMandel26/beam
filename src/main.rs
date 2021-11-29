@@ -27,6 +27,7 @@ pub struct Beam {
 enum Command {
     Connect(ConnectOpts),
     Config(ConfigOpts),
+    Ls(LsOpts),
 }
 
 #[derive(StructOpt, Debug, PartialEq, Default)]
@@ -47,8 +48,12 @@ pub struct ConfigOpts {
 pub struct ConnectOpts {
     #[structopt(help = "The host to connect to")]
     host: String,
-    #[structopt(short, long, help = "The proxy to use")]
-    proxy: Option<String>,
+}
+
+#[derive(StructOpt, Debug, PartialEq, Default)]
+pub struct LsOpts {
+    #[structopt(short, long, help = "The format to use for the output")]
+    format: Option<String>,
 }
 
 fn main() -> Result<()> {
@@ -60,9 +65,14 @@ fn main() -> Result<()> {
         Some(Command::Connect(cfg)) => {
             let clear_cache = beam.clear_cache;
             let user = beam.user.clone();
-            commands::connect::connect(cfg, user, clear_cache)?
+            let proxy = beam.proxy.clone();
+            commands::connect::connect(cfg, user, clear_cache, proxy)?
         }
         Some(Command::Config(cfg)) => commands::config::config(cfg)?,
+        Some(Command::Ls(cfg)) => {
+            let proxy = beam.proxy.clone();
+            commands::ls::ls(cfg, proxy)?
+        }
         None => commands::default::default(beam)?,
     }
 

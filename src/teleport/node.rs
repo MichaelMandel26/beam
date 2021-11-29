@@ -73,7 +73,7 @@ pub fn get(use_cache: bool, proxy: String) -> Result<Vec<Node>> {
 }
 
 fn get_from_tsh(proxy: String) -> Result<Vec<Node>> {
-    let tsh_json = cli::ls()?;
+    let tsh_json = cli::ls(Some("json".to_string()))?;
     let tsh_nodes: Vec<Node> = serde_json::from_str(&tsh_json)?;
 
     write_to_cache(tsh_json, proxy)?;
