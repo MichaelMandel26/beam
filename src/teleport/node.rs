@@ -74,7 +74,7 @@ fn get_from_tsh() -> Result<Vec<Node>> {
     let tsh_json = cli::ls()?;
     let tsh_nodes: Vec<Node> = serde_json::from_str(&tsh_json)?;
 
-    write_to_cache(tsh_json.to_string())?;
+    write_to_cache(tsh_json)?;
 
     Ok(tsh_nodes)
 }
