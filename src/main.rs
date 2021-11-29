@@ -15,6 +15,8 @@ pub struct Beam {
         help = "The user which will be used to connect to the host. (default is the current system user)"
     )]
     user: Option<String>,
+    #[structopt(short, long, help = "The proxy to use")]
+    proxy: Option<String>,
     #[structopt(short, long = "clear-cache", help = "Whether to clear the cache")]
     clear_cache: bool,
     #[structopt(subcommand)]
@@ -29,10 +31,12 @@ enum Command {
 
 #[derive(StructOpt, Debug, PartialEq, Default)]
 pub struct ConfigOpts {
-    #[structopt(short, long, help = "Whether to reset the specified configs", conflicts_with_all(&["username", "cache_ttl"]))]
+    #[structopt(short, long, help = "Whether to reset the specified configs", conflicts_with_all(&["username", "cache_ttl", "proxy"]))]
     reset: bool,
-    #[structopt(short, long, help = "The default username to use")]
+    #[structopt(short, long, help = "The username to use as a default")]
     username: Option<String>,
+    #[structopt(short, long, help = "The proxy to use as a default")]
+    proxy: Option<String>,
     #[structopt(short, long, help = "The TTL for the nodes cache file in seconds")]
     cache_ttl: Option<u64>,
 }
@@ -41,6 +45,8 @@ pub struct ConfigOpts {
 pub struct ConnectOpts {
     #[structopt(help = "The host to connect to")]
     host: String,
+    #[structopt(short, long, help = "The proxy to use")]
+    proxy: Option<String>,
 }
 
 fn main() -> Result<()> {
@@ -53,7 +59,7 @@ fn main() -> Result<()> {
             let clear_cache = beam.clear_cache;
             let user = beam.user.clone();
             commands::connect::connect(cfg, user, clear_cache)?
-        },
+        }
         Some(Command::Config(cfg)) => commands::config::config(cfg)?,
         None => commands::default::default(beam)?,
     }
