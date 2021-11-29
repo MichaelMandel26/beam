@@ -22,6 +22,10 @@ pub fn config(cfg: ConfigOpts) -> Result<()> {
         config.cache_ttl = Some(cache_ttl);
     }
 
+    if let Some(proxy) = cfg.proxy {
+        config.proxy = Some(proxy);
+    }
+
     config.write()?;
 
     println!("Config successfully updated");

@@ -13,6 +13,7 @@ lazy_static! {
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct Config {
     pub username: Option<String>,
+    pub proxy: Option<String>,
     pub cache_ttl: Option<u64>,
 }
 

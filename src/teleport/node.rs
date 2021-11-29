@@ -1,10 +1,11 @@
+use crate::teleport::cli;
 use crate::utils;
 use crate::utils::config::CONFIG;
 use anyhow::Result;
 use pad::PadStr;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use std::time::Duration;
-use std::{collections::HashMap, process::Command};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Node {
@@ -70,11 +71,7 @@ pub fn get(use_cache: bool) -> Result<Vec<Node>> {
 }
 
 fn get_from_tsh() -> Result<Vec<Node>> {
-    let tsh_list = Command::new("tsh")
-        .args(["ls", "-f", "json"])
-        .output()
-        .expect("failed to execute process");
-    let tsh_json = String::from_utf8_lossy(&tsh_list.stdout);
+    let tsh_json = cli::ls()?;
     let tsh_nodes: Vec<Node> = serde_json::from_str(&tsh_json)?;
 
     write_to_cache(tsh_json.to_string())?;
