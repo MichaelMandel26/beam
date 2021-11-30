@@ -1,5 +1,8 @@
+use crate::utils::config::CONFIG;
 use anyhow::Result;
+use std::process::Child;
 use std::process::Command;
+use std::process::ExitStatus;
 
 use crate::utils;
 
@@ -10,11 +13,19 @@ pub fn is_logged_in() -> Result<bool> {
     Ok(is_logged_in)
 }
 
-pub fn login(proxy: &str) -> Result<()> {
-    Command::new("tsh")
-        .args(["login", "--proxy", proxy])
-        .output()?;
-    Ok(())
+pub fn login(proxy: &str, auth: Option<String>) -> Result<ExitStatus> {
+    let mut args = vec!["login", "--proxy", proxy];
+
+    let mut process: Child;
+    if let Some(ref auth) = auth {
+        args.push("--auth");
+        args.push(auth);
+    } else if CONFIG.auth.is_some() {
+        args.push("--auth");
+        args.push(CONFIG.auth.as_ref().unwrap());
+    }
+    process = Command::new("tsh").args(args).spawn()?;
+    process.wait().map_err(|e| anyhow::anyhow!(e))
 }
 
 pub fn ls(format: Option<String>) -> Result<String> {

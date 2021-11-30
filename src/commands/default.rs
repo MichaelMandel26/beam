@@ -12,7 +12,7 @@ pub fn default(beam: Beam) -> Result<()> {
         None => CONFIG.proxy.clone().context("No proxy configured to login with. Please use --proxy or configure it with beam config --proxy <url>")?,
     };
     if !cli::is_logged_in()? {
-        cli::login(&proxy)?;
+        cli::login(&proxy, beam.auth)?;
     }
     let nodes = node::get(!beam.clear_cache, proxy)?;
 

@@ -17,6 +17,8 @@ pub struct Beam {
     user: Option<String>,
     #[structopt(short, long, help = "The proxy to use")]
     proxy: Option<String>,
+    #[structopt(short, long, help = "The auth to use")]
+    auth: Option<String>,
     #[structopt(short, long = "clear-cache", help = "Whether to clear the cache")]
     clear_cache: bool,
     #[structopt(subcommand)]
@@ -66,12 +68,14 @@ fn main() -> Result<()> {
             let clear_cache = beam.clear_cache;
             let user = beam.user.clone();
             let proxy = beam.proxy.clone();
-            commands::connect::connect(cfg, user, clear_cache, proxy)?
+            let auth = beam.auth.clone();
+            commands::connect::connect(cfg, user, clear_cache, proxy, auth)?
         }
         Some(Command::Config(cfg)) => commands::config::config(cfg)?,
         Some(Command::Ls(cfg)) => {
             let proxy = beam.proxy.clone();
-            commands::ls::ls(cfg, proxy)?
+            let auth = beam.auth.clone();
+            commands::ls::ls(cfg, proxy, auth)?
         }
         None => commands::default::default(beam)?,
     }
