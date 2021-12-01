@@ -13,7 +13,7 @@ pub fn is_logged_in() -> Result<bool> {
     Ok(is_logged_in)
 }
 
-pub fn login(proxy: &str, auth: Option<String>) -> Result<ExitStatus> {
+pub fn login(proxy: &str, auth: Option<&String>) -> Result<ExitStatus> {
     let mut args = vec!["login", "--proxy", proxy];
 
     let mut process: Child;
@@ -28,16 +28,14 @@ pub fn login(proxy: &str, auth: Option<String>) -> Result<ExitStatus> {
     process.wait().map_err(|e| anyhow::anyhow!(e))
 }
 
-pub fn ls(format: Option<String>) -> Result<String> {
+pub fn ls(format: Option<&String>) -> Result<String> {
     let format = match format {
         Some(format) => format,
-        None => "text".to_string(),
+        None => "text",
     };
     let spinner = utils::spinner::get_spinner();
     spinner.set_message("Getting nodes from teleport...");
-    let output = Command::new("tsh")
-        .args(["ls", "-f", format.as_str()])
-        .output()?;
+    let output = Command::new("tsh").args(["ls", "-f", format]).output()?;
 
     spinner.finish_with_message("Done");
     Ok(String::from_utf8_lossy(&output.stdout).to_string())

@@ -1,4 +1,7 @@
-use std::io::Read;
+use std::{
+    fmt::{Display, Formatter},
+    io::Read,
+};
 
 use anyhow::Result;
 use lazy_static::lazy_static;
@@ -40,5 +43,11 @@ impl Config {
         let config_str = toml::to_string(&self)?;
         std::fs::write(config_path, config_str)?;
         Ok(())
+    }
+}
+
+impl Display for Config {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        write!(f, "{}", toml::to_string(&self).unwrap())
     }
 }
