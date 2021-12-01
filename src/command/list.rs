@@ -19,7 +19,7 @@ impl List {
             }
         };
         if !cli::is_logged_in()? {
-            cli::login(&proxy, beam.auth.as_ref())?;
+            cli::login(proxy, beam.auth.as_ref())?;
         }
         let ls_output = cli::ls(self.format.as_ref())?;
 

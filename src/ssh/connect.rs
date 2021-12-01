@@ -1,7 +1,7 @@
 use anyhow::Result;
 use std::process::{Command, ExitStatus};
 
-pub fn connect(host: &String, username: &String) -> Result<ExitStatus> {
+pub fn connect(host: &str, username: &str) -> Result<ExitStatus> {
     let host_string = format!("{}@{}", username, host);
 
     let mut process = Command::new("tsh")

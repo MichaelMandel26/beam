@@ -17,7 +17,7 @@ pub fn login(proxy: &str, auth: Option<&String>) -> Result<ExitStatus> {
     let mut args = vec!["login", "--proxy", proxy];
 
     let mut process: Child;
-    if let Some(ref auth) = auth {
+    if let Some(auth) = auth {
         args.push("--auth");
         args.push(auth);
     } else if CONFIG.auth.is_some() {

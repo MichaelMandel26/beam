@@ -18,12 +18,12 @@ impl Default {
             }
         };
         if !cli::is_logged_in()? {
-            let exit_status = cli::login(&proxy, beam.auth.as_ref())?;
+            let exit_status = cli::login(proxy, beam.auth.as_ref())?;
             if !exit_status.success() {
                 return Err(anyhow::anyhow!("Login failed"));
             }
         }
-        let nodes = node::get(!beam.clear_cache, &proxy)?;
+        let nodes = node::get(!beam.clear_cache, proxy)?;
 
         let items = nodes
             .into_iter()

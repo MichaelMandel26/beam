@@ -27,7 +27,7 @@ impl Unset {
             config.cache_ttl = None;
         }
 
-        if let Some(_) = &self.proxy {
+        if self.proxy.is_some() {
             config.proxy = None;
         }
 

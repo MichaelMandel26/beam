@@ -22,9 +22,9 @@ impl Connect {
         };
 
         if !cli::is_logged_in()? {
-            cli::login(&proxy, beam.auth.as_ref())?;
+            cli::login(proxy, beam.auth.as_ref())?;
         }
-        let nodes = node::get(!beam.clear_cache, &proxy)?;
+        let nodes = node::get(!beam.clear_cache, proxy)?;
         ensure!(
             nodes.iter().any(|node| node.spec.hostname == self.host),
             "Host not found in teleport"
@@ -37,7 +37,7 @@ impl Connect {
         };
 
         clearscreen::clear()?;
-        ssh::connect::connect(&self.host, &username)?;
+        ssh::connect::connect(&self.host, username)?;
 
         Ok(())
     }

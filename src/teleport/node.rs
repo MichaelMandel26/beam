@@ -47,7 +47,7 @@ impl Node {
     }
 }
 
-pub fn get(use_cache: bool, proxy: &String) -> Result<Vec<Node>> {
+pub fn get(use_cache: bool, proxy: &str) -> Result<Vec<Node>> {
     let cache_file = home::home_dir()
         .unwrap()
         .join(format!(".beam/cache/{}.json", proxy));
@@ -72,7 +72,7 @@ pub fn get(use_cache: bool, proxy: &String) -> Result<Vec<Node>> {
     Ok(nodes)
 }
 
-fn get_from_tsh(proxy: &String) -> Result<Vec<Node>> {
+fn get_from_tsh(proxy: &str) -> Result<Vec<Node>> {
     let tsh_json = cli::ls(Some(&"json".to_string()))?;
     let tsh_nodes: Vec<Node> = serde_json::from_str(&tsh_json)?;
 
@@ -81,7 +81,7 @@ fn get_from_tsh(proxy: &String) -> Result<Vec<Node>> {
     Ok(tsh_nodes)
 }
 
-fn get_from_cache(proxy: &String) -> Result<Vec<Node>> {
+fn get_from_cache(proxy: &str) -> Result<Vec<Node>> {
     let cache_path = home::home_dir()
         .unwrap()
         .join(format!(".beam/cache/{}.json", proxy));
@@ -90,7 +90,7 @@ fn get_from_cache(proxy: &String) -> Result<Vec<Node>> {
     Ok(cached_nodes)
 }
 
-pub fn write_to_cache(nodes_json: String, proxy: &String) -> Result<()> {
+pub fn write_to_cache(nodes_json: String, proxy: &str) -> Result<()> {
     let cache_dir = home::home_dir().unwrap().join(".beam/cache");
     std::fs::create_dir_all(&cache_dir)?;
     let cache_file = cache_dir.join(format!("{}.json", proxy));
