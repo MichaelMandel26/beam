@@ -6,32 +6,32 @@ use crate::utils::config::Config;
 #[derive(StructOpt, Debug)]
 pub struct Unset {
     #[structopt(short, long, help = "The username to use as a default")]
-    username: Option<String>,
+    username: bool,
     #[structopt(short, long, help = "The proxy to use as a default")]
-    proxy: Option<String>,
+    proxy: bool,
     #[structopt(short, long, help = "The auth method to use as a default")]
-    auth: Option<String>,
+    auth: bool,
     #[structopt(short, long, help = "The TTL for the nodes cache file in seconds")]
-    cache_ttl: Option<u64>,
+    cache_ttl: bool,
 }
 
 impl Unset {
     pub fn run(&self) -> Result<()> {
         let mut config = Config::get()?.unwrap_or_default();
 
-        if self.username.is_some() {
+        if self.username {
             config.username = None;
         }
 
-        if let Some(_cache_ttl) = &self.cache_ttl {
+        if self.cache_ttl {
             config.cache_ttl = None;
         }
 
-        if self.proxy.is_some() {
+        if self.proxy {
             config.proxy = None;
         }
 
-        if let Some(_auth) = &self.auth {
+        if self.auth {
             config.auth = None;
         }
 

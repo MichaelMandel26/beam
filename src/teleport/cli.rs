@@ -25,8 +25,8 @@ pub fn login(proxy: &str, auth: Option<&String>) -> Result<ExitStatus> {
         auth_args = format!("--auth={}", CONFIG.auth.as_ref().unwrap());
         args.push(auth_args.as_str());
     }
-    
-    let mut process: Child;    
+
+    let mut process: Child;
     process = Command::new("tsh").args(args).spawn()?;
     process.wait().map_err(|e| anyhow::anyhow!(e))
 }
