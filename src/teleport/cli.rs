@@ -14,16 +14,19 @@ pub fn is_logged_in() -> Result<bool> {
 }
 
 pub fn login(proxy: &str, auth: Option<&String>) -> Result<ExitStatus> {
-    let mut args = vec!["login", "--proxy", proxy];
+    let proxy_args = format!("--proxy={}", proxy);
+    let mut args = vec!["login", proxy_args.as_str()];
 
-    let mut process: Child;
+    let auth_args;
     if let Some(auth) = auth {
-        args.push("--auth");
-        args.push(auth);
+        auth_args = format!("--auth={}", auth);
+        args.push(auth_args.as_str());
     } else if CONFIG.auth.is_some() {
-        args.push("--auth");
-        args.push(CONFIG.auth.as_ref().unwrap());
+        auth_args = format!("--auth={}", CONFIG.auth.as_ref().unwrap());
+        args.push(auth_args.as_str());
     }
+    
+    let mut process: Child;    
     process = Command::new("tsh").args(args).spawn()?;
     process.wait().map_err(|e| anyhow::anyhow!(e))
 }
