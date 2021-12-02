@@ -1,5 +1,5 @@
 [package]
-name = "beam"
+name = "beamcli"
 version = "0.1.1"
 edition = "2021"
 authors = ["Michael Mandel <michael@mandel.dev>"]
