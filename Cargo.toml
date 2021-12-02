@@ -2,8 +2,14 @@
 name = "beam"
 version = "0.1.1"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+authors = ["Michael Mandel <michael@mandel.dev>"]
+license = "MIT"
+description = "An Interface on top of the Teleport CLI."
+readme = "README.md"
+homepage = "https://github.com/MichaelMandel26/beam"
+repository = "https://github.com/MichaelMandel26/beam"
+keywords = ["cli", "teleport", "beam"]
+categories = ["command-line-utilities"]
 
 [dependencies]
 anyhow = "1.0.47"
