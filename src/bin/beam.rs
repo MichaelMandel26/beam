@@ -1,5 +1,5 @@
 use anyhow::Result;
-use beam::cli::Beam;
+use beamcli::cli::Beam;
 use structopt::StructOpt;
 
 fn main() -> Result<()> {
