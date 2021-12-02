@@ -28,5 +28,5 @@ For installing you will have to install Rust. [Rustup](https://rustup.rs/) is th
 You can install beam through running:
 
 ```bash
-cargo install beamcli
+cargo install
 ```
