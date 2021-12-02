@@ -24,6 +24,7 @@ beam connect server.example.com
 
 > Make sure that you have the [Teleport CLI](https://goteleport.com/docs/installation/) installed, before using Beam.
 
+For installing you will have to install Rust. [Rustup](https://rustup.rs/) is the recommended way to do that.  
 You can install beam through running:
 
 ```bash
