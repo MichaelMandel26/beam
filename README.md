@@ -1,5 +1,5 @@
 # Beam
-![Crates.io](https://img.shields.io/crates/v/beamcli)
+[![Crates.io](https://img.shields.io/crates/v/beamcli)](https://crates.io/crates/beamcli)
 ## What is Beam?
 
 Beam an interface on top of the Teleport CLI. It uses skim, a fuzzy finder written in Rust, to provide a nice interface for searching and filtering.
