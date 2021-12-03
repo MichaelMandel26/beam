@@ -33,7 +33,7 @@ impl Connect {
         let fallback = whoami::username();
         let username = match &beam.user {
             Some(username) => username,
-            None => &fallback,
+            None => CONFIG.username.as_ref().unwrap_or(&fallback),
         };
 
         clearscreen::clear()?;
