@@ -41,6 +41,18 @@ host2.example.com
 $ beam connect server.example.com
 ```
 
+### Caching
+
+By default Beam caches the list of nodes it receives from Teleport for 24 hours. To avoid using cache you can use the `--clear-cache` or `-c` flag:
+```bash
+$ beam -c
+```
+You can change the cache duration using the `--cache-ttl` flag.
+The following example will cache the list of nodes for 1 hour:
+```bash
+$ beam config set --cache-ttl 3600
+```
+
 ## Installation
 
 > Make sure that you have the [Teleport CLI](https://goteleport.com/docs/installation/) installed, before using Beam.
