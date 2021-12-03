@@ -65,7 +65,7 @@ pub fn get(use_cache: bool, proxy: &str) -> Result<Vec<Node>> {
         let spinner = utils::spinner::get_spinner();
         spinner.set_message("Getting nodes from teleport...");
         nodes = get_from_tsh(proxy)?;
-        spinner.finish_with_message("Done");
+        spinner.finish_and_clear();
     } else {
         nodes = get_from_cache(proxy)?;
     }

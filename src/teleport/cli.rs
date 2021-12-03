@@ -40,6 +40,6 @@ pub fn ls(format: Option<&String>) -> Result<String> {
     spinner.set_message("Getting nodes from teleport...");
     let output = Command::new("tsh").args(["ls", "-f", format]).output()?;
 
-    spinner.finish_with_message("Done");
+    spinner.finish_and_clear();
     Ok(String::from_utf8_lossy(&output.stdout).to_string())
 }
