@@ -7,6 +7,16 @@
 
 Beam an interface on top of the Teleport CLI. It uses skim, a fuzzy finder written in Rust, to provide a nice interface for searching and filtering.
 
+## Table of Contents
+- [Beam](#beam)
+  * [What is Beam?](#what-is-beam-)
+  * [Table of Contents](#table-of-contents)
+  * [Configuration](#configuration)
+    + [Caching](#caching)
+  * [Usage](#usage)
+  * [Installation](#installation)
+
+
 ## Configuration
 
 Before using Beam you will have to configure the Teleport proxy.
@@ -20,6 +30,18 @@ To use a different user, you can use the `--user` flag, or configure a new defau
 
 ```bash
 beam config set --user myuser
+```
+
+### Caching
+
+By default Beam caches the list of nodes it receives from Teleport for 24 hours. To avoid using cache you can use the `--clear-cache` or `-c` flag:
+```bash
+$ beam -c
+```
+You can change the cache duration using the `--cache-ttl` flag.
+The following example will cache the list of nodes for 1 hour:
+```bash
+$ beam config set --cache-ttl 3600
 ```
 
 ## Usage
@@ -39,18 +61,6 @@ host2.example.com
 3. Directly connect to a host via its hostname
 ```bash
 $ beam connect server.example.com
-```
-
-### Caching
-
-By default Beam caches the list of nodes it receives from Teleport for 24 hours. To avoid using cache you can use the `--clear-cache` or `-c` flag:
-```bash
-$ beam -c
-```
-You can change the cache duration using the `--cache-ttl` flag.
-The following example will cache the list of nodes for 1 hour:
-```bash
-$ beam config set --cache-ttl 3600
 ```
 
 ## Installation
