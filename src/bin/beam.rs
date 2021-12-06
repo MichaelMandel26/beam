@@ -4,7 +4,7 @@ use structopt::StructOpt;
 
 fn main() -> Result<()> {
     check_for_dot_beam_dir()?;
-    
+
     Beam::from_args().run()?;
 
     Ok(())

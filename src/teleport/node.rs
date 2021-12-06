@@ -4,7 +4,7 @@ use crate::utils::config::CONFIG;
 use anyhow::Result;
 use pad::PadStr;
 use serde::{Deserialize, Serialize};
-use std::{time::Duration};
+use std::time::Duration;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Node {
