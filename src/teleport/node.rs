@@ -4,8 +4,7 @@ use crate::utils::config::CONFIG;
 use anyhow::Result;
 use pad::PadStr;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
-use std::time::Duration;
+use std::{time::Duration};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Node {
@@ -16,10 +15,13 @@ pub struct Node {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Metadata {
     name: String,
-    labels: HashMap<String, String>,
+    #[serde(with = "serde_with::rust::tuple_list_as_map")]
+    labels: Vec<Label>,
     expires: String,
     id: i64,
 }
+
+type Label = (String, String);
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Spec {
