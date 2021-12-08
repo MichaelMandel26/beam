@@ -1,4 +1,5 @@
 use crate::ssh;
+use crate::teleport::node::SkimString;
 use crate::teleport::{cli, node};
 use crate::utils::config::CONFIG;
 use crate::utils::skim;
@@ -25,11 +26,7 @@ impl Default {
         }
         let nodes = node::get(!beam.clear_cache, proxy)?;
 
-        let items = nodes
-            .into_iter()
-            .map(|node| node.into_skim_string())
-            .collect::<Vec<String>>()
-            .join("\n");
+        let items = nodes.to_skim_string();
 
         let selected_item = match skim::skim(items)? {
             Some(item) => item,
