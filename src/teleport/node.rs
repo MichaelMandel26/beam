@@ -3,7 +3,7 @@ use crate::utils;
 use crate::utils::config::CONFIG;
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
-use std::{time::Duration, collections::HashMap};
+use std::{collections::HashMap, time::Duration};
 
 pub trait SkimString {
     fn to_skim_string(self) -> String;
@@ -31,68 +31,57 @@ pub struct Spec {
     pub hostname: String,
 }
 
-impl SkimString for Vec<Node>  {
-    fn to_skim_string(self) -> String{
+impl SkimString for Vec<Node> {
+    fn to_skim_string(self) -> String {
         let mut skim_string = String::new();
 
-
         // Get longest label and hostname lengths
-        let longest_hostname_length = self.iter().map(|node| node.spec.hostname.len()).max().unwrap_or(0);
+        let longest_hostname_length = self
+            .iter()
+            .map(|node| node.spec.hostname.len())
+            .max()
+            .unwrap_or(0);
         let mut label_map: HashMap<usize, (usize, Vec<String>)> = HashMap::new();
-
         for node in &self {
-        for (i, (key, value)) in node.metadata.labels.iter().enumerate() {
-            let key_value_string = format!("{}:{}", key, value);
+            for (i, (key, value)) in node.metadata.labels.iter().enumerate() {
+                let key_value_string = format!("{}:{}", key, value);
                 if !label_map.contains_key(&i) {
                     label_map.insert(i, (key_value_string.len(), vec![key_value_string]));
-                } else if label_map[&i].0 < key_value_string.len() {
-                    label_map.get_mut(&i).unwrap().0 = key_value_string.len();
-                    label_map.get_mut(&i).unwrap().1.push(key_value_string);
                 } else {
-                    label_map.get_mut(&i).unwrap().1.push(key_value_string);
+                    if label_map[&i].0 < key_value_string.len() {
+                        label_map.get_mut(&i).unwrap().0 = key_value_string.len();
+
+                        label_map.get_mut(&i).unwrap().1.push(key_value_string);
+                    }
                 }
             }
         }
-         
 
+        // Generate skim item string
         for (i, node) in self.iter().enumerate() {
             let mut label_string_width_padding = String::new();
-            
+
             for (j, _) in node.metadata.labels.iter().enumerate() {
                 let label_string = &label_map.get(&j).unwrap().1[i];
                 let longest_label_length = label_map.get(&j).unwrap().0;
-                let padding_length = label_string.len() + longest_label_length - label_string.len() + 1;
-                label_string_width_padding += format!("{:<width$}", label_string, width = padding_length).as_str();
+                let padding_length =
+                    label_string.len() + longest_label_length - label_string.len() + 1;
+                label_string_width_padding +=
+                    format!("{:<width$}", label_string, width = padding_length).as_str();
             }
 
-            // for (i, (key, value)) in node.metadata.labels.iter().enumerate() {
-            //     let key_value_string = format!("{}:{}", key, value);
-
-            //     label_string += format!("{:-<width$}", key_value_string, width = longest_labels[i]+3).as_str();
-            // }
-
-            skim_string += format!("{:<width$} {}\n", node.spec.hostname, label_string_width_padding, width = longest_hostname_length).as_str();
+            skim_string += format!(
+                "{:<width$} {}\n",
+                node.spec.hostname,
+                label_string_width_padding,
+                width = longest_hostname_length
+            )
+            .as_str();
         }
+
         skim_string
     }
 }
-
-// impl Node {
-//     pub fn into_skim_string(self, padding_right: usize) -> String {
-//         let labels: Vec<Label> = self.metadata.labels.into_iter().map(|(k, v)| (k, v)).collect();
-//         let mut label_string = String::new();
-
-
-//         let string = format!(
-//             "{} {}",
-//             self.spec
-//                 .hostname
-//                 .pad_to_width_with_alignment(30, pad::Alignment::Left),
-//             label_string
-//         );
-//         string
-//     }
-// }
 
 pub fn get(use_cache: bool, proxy: &str) -> Result<Vec<Node>> {
     let cache_file = home::home_dir()
