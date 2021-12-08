@@ -50,9 +50,8 @@ impl SkimString for Vec<Node> {
                 } else {
                     if label_map[&i].0 < key_value_string.len() {
                         label_map.get_mut(&i).unwrap().0 = key_value_string.len();
-
-                        label_map.get_mut(&i).unwrap().1.push(key_value_string);
                     }
+                    label_map.get_mut(&i).unwrap().1.push(key_value_string);
                 }
             }
         }
@@ -62,6 +61,7 @@ impl SkimString for Vec<Node> {
             let mut label_string_width_padding = String::new();
 
             for (j, _) in node.metadata.labels.iter().enumerate() {
+                dbg!(label_map.get(&j).unwrap());
                 let label_string = &label_map.get(&j).unwrap().1[i];
                 let longest_label_length = label_map.get(&j).unwrap().0;
                 let padding_length =
