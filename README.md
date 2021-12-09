@@ -126,6 +126,8 @@ $ beam completions zsh > ~/.zfunc/_beam
 ```
 
 ```bash
+$ sudo apt install bash-completions
+$ mkdir -p ~/.local/share/bash-completion/completions
 $ beam completions bash > ~/.local/share/bash-completion/completions/beam
 ```
 
