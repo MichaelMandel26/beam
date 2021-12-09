@@ -57,7 +57,7 @@ impl SkimString for Vec<Node> {
                 "{:<width$} {}\n",
                 node.spec.hostname,
                 label_string,
-                width = longest_hostname_length + 2
+                width = longest_hostname_length + 15
             )
             .as_str();
         }
