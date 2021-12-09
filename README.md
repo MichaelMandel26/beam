@@ -16,6 +16,7 @@ Beam an interface on top of the Teleport CLI. It uses skim, a fuzzy finder writt
     + [Caching](#caching)
   * [Usage](#usage)
     + [Search Syntax](#search-syntax)
+  * [Adding completions to your shell](#adding-completions-to-your-shell)
 
 
 ## Installation
@@ -39,22 +40,27 @@ cargo install beamcli
 Before using Beam you will have to configure the Teleport proxy.
 
 ```bash
-beam config set --proxy teleport.example.com
+$ beam config set --proxy teleport.example.com
+```
+
+If you want to use SSO as your authentication method, you can configure it as well:
+
+```bash
+$ beam config set --auth sso
 ```
 
 Beam will automatically use the user, from which you are running the command, as the username for connecting to a host.
 To use a different user, you can use the `--user` flag, or configure a new default using the following command:
 
 ```bash
-beam config set --username myuser
+$ beam config set --username myuser
 ```
 
 You can also specify a list of labels that will explicitly be shown. If you don't specify any, Beam will show all labels.
 
 ```bash
-beam config set --label-whitelist environment application
+$ beam config set --label-whitelist environment application
 ```
-
 
 ### Caching
 
@@ -110,3 +116,20 @@ See [skim](https://github.com/lotabout/skim) for more information.
     `.markdown`.
 - `OR` has higher precedence. So `readme .md$ | .markdown$` is grouped into
     `readme AND (.md$ OR .markdown$)`.
+
+## Adding completions to your shell
+
+In order to add completions to your shell, you can use one of the following commands:
+
+```bash
+$ beam completions zsh > ~/.zfunc/_beam
+```
+
+```bash
+$ beam completions bash > ~/.local/share/bash-completion/completions/beam
+```
+
+```bash
+$ mkdir -p ~/.config/fish/completions
+$ beam completions fish > ~/.config/fish/completions/beam.fish
+```
