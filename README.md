@@ -49,6 +49,13 @@ To use a different user, you can use the `--user` flag, or configure a new defau
 beam config set --user myuser
 ```
 
+You can also specify a list of labels that will explicitly be shown. If you don't specify any, Beam will show all labels.
+
+```bash
+beam config set --label-whitelist environment application
+```
+
+
 ### Caching
 
 By default Beam caches the list of nodes it receives from Teleport for 24 hours. To avoid using cache you can use the `--clear-cache` or `-c` flag:
