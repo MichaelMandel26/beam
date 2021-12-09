@@ -2,8 +2,9 @@ use crate::teleport::cli;
 use crate::utils;
 use crate::utils::config::CONFIG;
 use anyhow::Result;
+use itertools::Itertools;
 use serde::{Deserialize, Serialize};
-use std::time::Duration;
+use std::{collections::HashMap, time::Duration};
 
 pub trait SkimString {
     fn to_skim_string(self) -> String;
@@ -18,13 +19,10 @@ pub struct Node {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Metadata {
     name: String,
-    #[serde(with = "serde_with::rust::tuple_list_as_map")]
-    labels: Vec<Label>,
+    labels: HashMap<String, String>,
     expires: String,
     id: i64,
 }
-
-type Label = (String, String);
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Spec {
@@ -48,24 +46,18 @@ impl SkimString for Vec<Node> {
         let label_whitelist = CONFIG.label_whitelist.clone().unwrap_or_default();
         // Generate skim item string
         for node in nodes {
-            // Alphabetically sort labels of node
-            let mut labels: Vec<Label> = node.metadata.labels.clone();
-            labels = labels
-                .into_iter()
-                .filter(|label| label_whitelist.contains(&label.0))
-                .collect();
-            labels.sort_by(|a, b| a.0.cmp(&b.0));
-
             let mut label_string = String::new();
-            for (key, value) in labels {
-                label_string += format!("{}:{} ", key, value).as_str();
+            for key in node.metadata.labels.keys().sorted() {
+                if label_whitelist.contains(key) {
+                    label_string += format!("{}:{} ", key, node.metadata.labels[key]).as_str();
+                }
             }
 
             skim_string += format!(
                 "{:<width$} {}\n",
                 node.spec.hostname,
                 label_string,
-                width = longest_hostname_length+2
+                width = longest_hostname_length + 2
             )
             .as_str();
         }
