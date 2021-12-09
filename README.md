@@ -11,10 +11,27 @@ Beam an interface on top of the Teleport CLI. It uses skim, a fuzzy finder writt
 - [Beam](#beam)
   * [What is Beam?](#what-is-beam-)
   * [Table of Contents](#table-of-contents)
+  * [Installation](#installation)
   * [Configuration](#configuration)
     + [Caching](#caching)
   * [Usage](#usage)
-  * [Installation](#installation)
+    + [Search Syntax](#search-syntax)
+
+
+## Installation
+
+> Make sure that you have the [Teleport CLI](https://goteleport.com/docs/installation/) installed, before using Beam.
+
+For installing you will have to install Rust. [Rustup](https://rustup.rs/) is the recommended way to do that.  
+You can install beam through running:
+
+```bash
+rustup default nightly && rustup update
+```
+
+```bash
+cargo install beamcli
+```
 
 
 ## Configuration
@@ -31,6 +48,13 @@ To use a different user, you can use the `--user` flag, or configure a new defau
 ```bash
 beam config set --user myuser
 ```
+
+You can also specify a list of labels that will explicitly be shown. If you don't specify any, Beam will show all labels.
+
+```bash
+beam config set --label-whitelist environment application
+```
+
 
 ### Caching
 
@@ -63,17 +87,26 @@ host2.example.com
 $ beam connect server.example.com
 ```
 
-## Installation
+### Search Syntax
 
-> Make sure that you have the [Teleport CLI](https://goteleport.com/docs/installation/) installed, before using Beam.
+Beam uses skim under the hood for its fuzzy search. The syntax for searching is the same as for skim.
+See [skim](https://github.com/lotabout/skim) for more information.
 
-For installing you will have to install Rust. [Rustup](https://rustup.rs/) is the recommended way to do that.  
-You can install beam through running:
+| Token    | Match type                 | Description                       |
+|----------|----------------------------|-----------------------------------|
+| `text`   | fuzzy-match                | items that match `text`           |
+| `^music` | prefix-exact-match         | items that start with `music`     |
+| `.mp3$`  | suffix-exact-match         | items that end with `.mp3`        |
+| `'wild`  | exact-match (quoted)       | items that include `wild`         |
+| `!fire`  | inverse-exact-match        | items that do not include `fire`  |
+| `!.mp3$` | inverse-suffix-exact-match | items that do not end with `.mp3` |
 
-```bash
-rustup default nightly && rustup update
-```
+`skim` also supports the combination of tokens.
 
-```bash
-cargo install beamcli
-```
+- Whitespace has the meaning of `AND`. With the term `src main`, `skim` will search
+    for items that match **both** `src` and `main`.
+- ` | ` means `OR` (note the spaces around `|`). With the term `.md$ |
+    .markdown$`, `skim` will search for items ends with either `.md` or
+    `.markdown`.
+- `OR` has higher precedence. So `readme .md$ | .markdown$` is grouped into
+    `readme AND (.md$ OR .markdown$)`.

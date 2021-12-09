@@ -19,6 +19,7 @@ pub struct Config {
     pub proxy: Option<String>,
     pub auth: Option<String>,
     pub cache_ttl: Option<u64>,
+    pub label_whitelist: Option<Vec<String>>,
 }
 
 impl Config {

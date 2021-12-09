@@ -2,10 +2,13 @@ use crate::teleport::cli;
 use crate::utils;
 use crate::utils::config::CONFIG;
 use anyhow::Result;
-use pad::PadStr;
+use itertools::Itertools;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
-use std::time::Duration;
+use std::{collections::HashMap, time::Duration};
+
+pub trait SkimString {
+    fn to_skim_string(self) -> String;
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Node {
@@ -26,24 +29,40 @@ pub struct Spec {
     pub hostname: String,
 }
 
-impl Node {
-    pub fn into_skim_string(self) -> String {
-        let mut label_string = String::new();
-        for (key, value) in &self.metadata.labels {
-            label_string.push_str(key);
-            label_string.push(':');
-            label_string.push_str(value);
-            label_string.push(' ');
+impl SkimString for Vec<Node> {
+    fn to_skim_string(self) -> String {
+        let mut skim_string = String::new();
+        // Get longest hostname length
+        let longest_hostname_length = self
+            .iter()
+            .map(|node| node.spec.hostname.len())
+            .max()
+            .unwrap_or(0);
+
+        // sort nodes by hostname reverse
+        let mut nodes = self;
+        nodes.sort_by(|a, b| b.spec.hostname.cmp(&a.spec.hostname));
+
+        let label_whitelist = CONFIG.label_whitelist.clone().unwrap_or_default();
+        // Generate skim item string
+        for node in nodes {
+            let mut label_string = String::new();
+            for key in node.metadata.labels.keys().sorted() {
+                if label_whitelist.contains(key) {
+                    label_string += format!("{}:{} ", key, node.metadata.labels[key]).as_str();
+                }
+            }
+
+            skim_string += format!(
+                "{:<width$} {}\n",
+                node.spec.hostname,
+                label_string,
+                width = longest_hostname_length + 15
+            )
+            .as_str();
         }
 
-        let string = format!(
-            "{} {}",
-            self.spec
-                .hostname
-                .pad_to_width_with_alignment(30, pad::Alignment::Left),
-            label_string
-        );
-        string
+        skim_string
     }
 }
 
