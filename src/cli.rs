@@ -1,4 +1,6 @@
+use crate::utils::version;
 use anyhow::Result;
+use semver::Version;
 use structopt::StructOpt;
 
 use crate::command;
@@ -33,16 +35,16 @@ pub enum Command {
     List(command::list::List),
 }
 
-#[derive(StructOpt, Debug, PartialEq, Default)]
-pub struct LsOpts {
-    #[structopt(short, long, help = "The format to use for the output")]
-    format: Option<String>,
-}
-
 impl Beam {
-    pub fn run(&self) -> Result<()> {
+    pub async fn run(&self) -> Result<()> {
+        Beam::check_for_dot_beam_dir()?;
+        // Asynchronously getting the latest version from GitHub
+        let latest_version = tokio::spawn(async move { version::get_latest_release().await });
+
         self.execute_command()?;
 
+        // Printing notification if the latest version is newer than the current version
+        Beam::check_for_update(latest_version.await??)?;
         Ok(())
     }
 
@@ -53,5 +55,24 @@ impl Beam {
             Some(Command::List(command)) => command.run(self),
             None => command::default::Default::run(self),
         }
+    }
+
+    pub fn check_for_update(latest_version: Version) -> Result<()> {
+        let current_version = version::get_current_version();
+        if latest_version > current_version {
+            println!("A new version of beam is available: {}", latest_version);
+        }
+        Ok(())
+    }
+
+    pub fn check_for_dot_beam_dir() -> Result<()> {
+        let home_dir = home::home_dir().expect("Could not find home directory");
+        let dot_beam_dir = home_dir.join(".beam");
+
+        if !dot_beam_dir.exists() {
+            std::fs::create_dir(&dot_beam_dir)?;
+        }
+
+        Ok(())
     }
 }

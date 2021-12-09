@@ -46,7 +46,7 @@ Beam will automatically use the user, from which you are running the command, as
 To use a different user, you can use the `--user` flag, or configure a new default using the following command:
 
 ```bash
-beam config set --user myuser
+beam config set --username myuser
 ```
 
 You can also specify a list of labels that will explicitly be shown. If you don't specify any, Beam will show all labels.
