@@ -42,7 +42,7 @@ impl SkimString for Vec<Node> {
             .unwrap_or(0);
 
         // sort nodes by hostname reverse
-        let mut nodes = self.clone();
+        let mut nodes = self;
         nodes.sort_by(|a, b| b.spec.hostname.cmp(&a.spec.hostname));
 
         let label_whitelist = CONFIG.label_whitelist.clone().unwrap_or_default();
