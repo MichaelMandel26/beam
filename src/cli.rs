@@ -34,6 +34,7 @@ pub enum Command {
     Connect(command::connect::Connect),
     Config(command::config::Config),
     List(command::list::List),
+    Completions(command::completions::Completions),
 }
 
 impl Beam {
@@ -54,6 +55,7 @@ impl Beam {
             Some(Command::Connect(command)) => command.run(self),
             Some(Command::Config(command)) => command.run(),
             Some(Command::List(command)) => command.run(self),
+            Some(Command::Completions(command)) => command.run(),
             None => command::default::Default::run(self),
         }
     }
