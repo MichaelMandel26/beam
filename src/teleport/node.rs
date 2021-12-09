@@ -48,7 +48,7 @@ impl SkimString for Vec<Node> {
         for node in nodes {
             let mut label_string = String::new();
             for key in node.metadata.labels.keys().sorted() {
-                if label_whitelist.contains(key) {
+                if label_whitelist.is_empty() || label_whitelist.contains(key) {
                     label_string += format!("{}:{} ", key, node.metadata.labels[key]).as_str();
                 }
             }
