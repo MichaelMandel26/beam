@@ -3,7 +3,7 @@ use crate::utils;
 use crate::utils::config::CONFIG;
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
-use std::{collections::HashMap, time::Duration};
+use std::time::Duration;
 
 pub trait SkimString {
     fn to_skim_string(self) -> String;
@@ -34,53 +34,37 @@ pub struct Spec {
 impl SkimString for Vec<Node> {
     fn to_skim_string(self) -> String {
         let mut skim_string = String::new();
-        let label_whitelist = CONFIG.label_whitelist.clone().unwrap_or_default();
-        // Get longest label and hostname lengths
+        // Get longest hostname length
         let longest_hostname_length = self
             .iter()
             .map(|node| node.spec.hostname.len())
             .max()
             .unwrap_or(0);
-        let mut label_map: HashMap<String, usize> = HashMap::new();
-        for node in &self {
-            for (key, value) in &node.metadata.labels {
-                if !label_whitelist.is_empty() && !label_whitelist.contains(key) {
-                    continue;
-                }
-                let key_value_string = format!("{}:{}", key, value);
-                if !label_map.contains_key(key) {
-                    label_map.insert(key.to_string(), key_value_string.len());
-                } else if label_map[key] < key_value_string.len() {
-                    *label_map.get_mut(key).unwrap() = key_value_string.len();
-                }
-            }
-        }
-        
+
         // sort nodes by hostname reverse
         let mut nodes = self.clone();
         nodes.sort_by(|a, b| b.spec.hostname.cmp(&a.spec.hostname));
 
-
+        let label_whitelist = CONFIG.label_whitelist.clone().unwrap_or_default();
         // Generate skim item string
         for node in nodes {
-            let mut label_string_width_padding = String::new();
             // Alphabetically sort labels of node
             let mut labels: Vec<Label> = node.metadata.labels.clone();
-            labels = labels.into_iter().filter(|label| label_whitelist.contains(&label.0)).collect();
+            labels = labels
+                .into_iter()
+                .filter(|label| label_whitelist.contains(&label.0))
+                .collect();
             labels.sort_by(|a, b| a.0.cmp(&b.0));
 
+            let mut label_string = String::new();
             for (key, value) in labels {
-                let label_string = format!("{}:{}", key, value);
-                let longest_label_length = label_map.get(&key).unwrap();
-                let padding_length =label_string.len() + longest_label_length - label_string.len() + 1;
-                label_string_width_padding +=
-                    format!("{:<width$.}", label_string, width = padding_length).as_str();
+                label_string += format!("{}:{} ", key, value).as_str();
             }
 
             skim_string += format!(
                 "{:<width$} {}\n",
                 node.spec.hostname,
-                label_string_width_padding,
+                label_string,
                 width = longest_hostname_length
             )
             .as_str();

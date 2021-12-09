@@ -13,8 +13,12 @@ pub struct Unset {
     auth: bool,
     #[structopt(short, long, help = "The TTL for the nodes cache file in seconds")]
     cache_ttl: bool,
-    #[structopt(short, long, help = "A list of labels that should be shown. If none is set all labels will be shown")]
-    label_whitelist: bool
+    #[structopt(
+        short,
+        long,
+        help = "A list of labels that should be shown. If none is set all labels will be shown"
+    )]
+    label_whitelist: bool,
 }
 
 impl Unset {
