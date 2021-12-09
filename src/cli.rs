@@ -1,5 +1,6 @@
 use crate::utils::version;
 use anyhow::Result;
+use colored::Colorize;
 use semver::Version;
 use structopt::StructOpt;
 
@@ -60,7 +61,12 @@ impl Beam {
     pub fn check_for_update(latest_version: Version) -> Result<()> {
         let current_version = version::get_current_version();
         if latest_version > current_version {
-            println!("A new version of beam is available: {}", latest_version);
+            println!(
+                "A new version of beam is available {} -> {}\nTo update run {}",
+                current_version.to_string().red(),
+                latest_version.to_string().green(),
+                "cargo install beam".green()
+            );
         }
         Ok(())
     }
