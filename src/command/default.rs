@@ -1,10 +1,11 @@
+use anyhow::{Context, Result};
+use structopt::StructOpt;
+
 use crate::ssh;
 use crate::teleport::node::SkimString;
 use crate::teleport::{cli, node};
-use crate::utils::config::CONFIG;
+use crate::utils::profile::DEFAULT_PROFILE;
 use crate::utils::skim;
-use anyhow::{Context, Result};
-use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]
 pub struct Default {}
@@ -14,7 +15,7 @@ impl Default {
         let proxy = match &beam.proxy {
             Some(proxy) => proxy,
             None => {
-                let proxy = &CONFIG.proxy;
+                let proxy = &DEFAULT_PROFILE.config.proxy;
                 proxy.as_ref().context("No proxy configured to login with. Please use --proxy or configure it with beam config --proxy <url>")?
             }
         };
@@ -40,7 +41,7 @@ impl Default {
         let fallback = whoami::username();
         let username = match &beam.user {
             Some(username) => username,
-            None => CONFIG.username.as_ref().unwrap_or(&fallback),
+            None => DEFAULT_PROFILE.config.username.as_ref().unwrap_or(&fallback),
         };
 
         clearscreen::clear()?;

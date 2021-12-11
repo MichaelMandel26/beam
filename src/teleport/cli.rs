@@ -1,10 +1,8 @@
-use crate::utils::config::CONFIG;
 use anyhow::Result;
-use std::process::Child;
-use std::process::Command;
-use std::process::ExitStatus;
+use std::process::{Child, Command, ExitStatus};
 
-use crate::utils;
+use crate::utils::spinner;
+use crate::utils::profile::DEFAULT_PROFILE;
 
 pub fn is_logged_in() -> Result<bool> {
     let output = Command::new("tsh").args(["status"]).output()?;
@@ -21,8 +19,8 @@ pub fn login(proxy: &str, auth: Option<&String>) -> Result<ExitStatus> {
     if let Some(auth) = auth {
         auth_args = format!("--auth={}", auth);
         args.push(auth_args.as_str());
-    } else if CONFIG.auth.is_some() {
-        auth_args = format!("--auth={}", CONFIG.auth.as_ref().unwrap());
+    } else if DEFAULT_PROFILE.config.auth.is_some() {
+        auth_args = format!("--auth={}", DEFAULT_PROFILE.config.auth.as_ref().unwrap());
         args.push(auth_args.as_str());
     }
 
@@ -36,7 +34,7 @@ pub fn ls(format: Option<&String>) -> Result<String> {
         Some(format) => format,
         None => "text",
     };
-    let spinner = utils::spinner::get_spinner();
+    let spinner = spinner::get_spinner();
     spinner.set_message("Getting nodes from teleport...");
     let output = Command::new("tsh").args(["ls", "-f", format]).output()?;
 

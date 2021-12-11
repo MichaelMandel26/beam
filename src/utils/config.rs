@@ -7,11 +7,9 @@ use anyhow::Result;
 use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
 
-const BEAM_PATH: &str = ".beam/config.toml";
-
-lazy_static! {
-    pub static ref CONFIG: Config = Config::get().unwrap_or_default().unwrap_or_default();
-}
+// lazy_static! {
+//     pub static ref CONFIG: Config = Config::get().unwrap_or_default().unwrap_or_default();
+// }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct Config {
@@ -23,28 +21,30 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn get() -> Result<Option<Config>> {
-        let config_path = home::home_dir().unwrap().join(BEAM_PATH);
+    // TODO: Remove
 
-        if !config_path.exists() {
-            return Ok(None);
-        }
+    // pub fn get() -> Result<Option<Config>> {
+    //     let config_path = home::home_dir().unwrap().join(BEAM_PATH);
 
-        let mut config_file = std::fs::File::open(config_path)?;
-        let mut config_str = String::new();
-        config_file.read_to_string(&mut config_str)?;
+    //     if !config_path.exists() {
+    //         return Ok(None);
+    //     }
 
-        let config: Config = toml::from_str(&config_str)?;
+    //     let mut config_file = std::fs::File::open(config_path)?;
+    //     let mut config_str = String::new();
+    //     config_file.read_to_string(&mut config_str)?;
 
-        Ok(Some(config))
-    }
+    //     let config: Config = toml::from_str(&config_str)?;
 
-    pub fn write(&self) -> Result<()> {
-        let config_path = home::home_dir().unwrap().join(BEAM_PATH);
-        let config_str = toml::to_string(&self)?;
-        std::fs::write(config_path, config_str)?;
-        Ok(())
-    }
+    //     Ok(Some(config))
+    // }
+
+    // pub fn write(&self) -> Result<()> {
+    //     let config_path = home::home_dir().unwrap().join(BEAM_PATH);
+    //     let config_str = toml::to_string(&self)?;
+    //     std::fs::write(config_path, config_str)?;
+    //     Ok(())
+    // }
 }
 
 impl Display for Config {

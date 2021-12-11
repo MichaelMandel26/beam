@@ -1,7 +1,8 @@
-use crate::teleport::cli;
-use crate::utils::config::CONFIG;
 use anyhow::{Context, Result};
 use structopt::StructOpt;
+
+use crate::teleport::cli;
+use crate::utils::profile::DEFAULT_PROFILE;
 
 #[derive(Debug, StructOpt)]
 pub struct List {
@@ -14,7 +15,7 @@ impl List {
         let proxy = match &beam.proxy {
             Some(proxy) => proxy,
             None => {
-                let proxy = &CONFIG.proxy;
+                let proxy = &DEFAULT_PROFILE.config.proxy;
                 proxy.as_ref().context("No proxy configured to login with. Please use --proxy or configure it with beam config --proxy <url>")?
             }
         };

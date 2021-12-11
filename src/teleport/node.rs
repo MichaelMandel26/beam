@@ -1,10 +1,11 @@
-use crate::teleport::cli;
-use crate::utils;
-use crate::utils::config::CONFIG;
 use anyhow::Result;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, time::Duration};
+
+use crate::teleport::cli;
+use crate::utils;
+use crate::utils::profile::DEFAULT_PROFILE;
 
 pub trait SkimString {
     fn to_skim_string(self) -> String;
@@ -43,7 +44,7 @@ impl SkimString for Vec<Node> {
         let mut nodes = self;
         nodes.sort_by(|a, b| b.spec.hostname.cmp(&a.spec.hostname));
 
-        let label_whitelist = CONFIG.label_whitelist.clone().unwrap_or_default();
+        let label_whitelist = DEFAULT_PROFILE.config.label_whitelist.clone().unwrap_or_default();
         // Generate skim item string
         for node in nodes {
             let mut label_string = String::new();
@@ -73,7 +74,7 @@ pub fn get(use_cache: bool, proxy: &str) -> Result<Vec<Node>> {
 
     let is_cache_file_old = if cache_file.exists() {
         let metadata = cache_file.metadata()?;
-        let ttl = CONFIG.cache_ttl.unwrap_or(60 * 60 * 24);
+        let ttl = DEFAULT_PROFILE.config.cache_ttl.unwrap_or(60 * 60 * 24);
         metadata.modified()?.elapsed()? > Duration::from_secs(ttl)
     } else {
         true
