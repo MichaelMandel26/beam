@@ -102,7 +102,7 @@ impl Configure {
 
         config.proxy = Some(proxy);
         config.username = Some(username);
-        config.auth = if auth == "default" { Some(auth) } else { None };
+        config.auth = if auth != "default" { Some(auth) } else { None };
         config.cache_ttl = Some(cache_ttl.parse::<u64>()?);
 
         Ok(())
