@@ -22,7 +22,7 @@ impl Connect {
         };
 
         if !cli::is_logged_in()? {
-            cli::login(proxy, beam.auth.as_ref())?;
+            cli::login(proxy, beam.auth.as_ref(), beam.user.as_ref())?;
         }
         let nodes = node::get(!beam.clear_cache, proxy)?;
         ensure!(

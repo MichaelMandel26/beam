@@ -11,9 +11,21 @@ pub fn is_logged_in() -> Result<bool> {
     Ok(is_logged_in)
 }
 
-pub fn login(proxy: &str, auth: Option<&String>) -> Result<ExitStatus> {
+pub fn login(proxy: &str, auth: Option<&String>, user: Option<&String>) -> Result<ExitStatus> {
     let proxy_args = format!("--proxy={}", proxy);
     let mut args = vec!["login", proxy_args.as_str()];
+
+    let user_args;
+    if let Some(user) = user {
+        user_args = format!("--user={}", user);
+        args.push(user_args.as_str());
+    } else if DEFAULT_PROFILE.config.username.is_some() {
+        user_args = format!(
+            "--user={}",
+            DEFAULT_PROFILE.config.username.as_ref().unwrap()
+        );
+        args.push(user_args.as_str());
+    }
 
     let auth_args;
     if let Some(auth) = auth {

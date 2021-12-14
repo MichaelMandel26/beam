@@ -16,7 +16,16 @@ impl Configure {
 
         let mut profile = match profiles.len().cmp(&1) {
             std::cmp::Ordering::Greater => {
-                let profile_names = profiles.iter().map(|p| p.name.clone()).collect::<Vec<_>>();
+                let profile_names = profiles
+                    .iter()
+                    .map(|p| {
+                        if p.default {
+                            format!("{} (default)", p.name)
+                        } else {
+                            p.name.clone()
+                        }
+                    })
+                    .collect::<Vec<_>>();
                 let selection = Select::with_theme(&ColorfulTheme::default())
                     .with_prompt("Please select the profile you want to configure")
                     .default(0)

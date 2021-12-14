@@ -20,7 +20,7 @@ impl Default {
             }
         };
         if !cli::is_logged_in()? {
-            let exit_status = cli::login(proxy, beam.auth.as_ref())?;
+            let exit_status = cli::login(proxy, beam.auth.as_ref(), beam.user.as_ref())?;
             if !exit_status.success() {
                 return Err(anyhow::anyhow!("Login failed"));
             }

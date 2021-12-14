@@ -80,7 +80,7 @@ impl Profiles {
 
 #[derive(Debug, Deserialize, Serialize, Clone, Default)]
 pub struct Profile {
-    #[serde(skip_deserializing)]
+    #[serde(skip)]
     pub name: String,
     pub default: bool,
     #[serde(flatten)]
