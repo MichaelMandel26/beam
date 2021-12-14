@@ -1,7 +1,7 @@
 use anyhow::Result;
 use structopt::StructOpt;
 
-use crate::utils::config::Config;
+use crate::utils::profile::DEFAULT_PROFILE;
 
 #[derive(StructOpt, Debug)]
 pub struct Unset {
@@ -23,7 +23,7 @@ pub struct Unset {
 
 impl Unset {
     pub fn run(&self) -> Result<()> {
-        let mut config = Config::get()?.unwrap_or_default();
+        let mut config = DEFAULT_PROFILE.config.clone();
 
         if self.username {
             config.username = None;
@@ -45,7 +45,7 @@ impl Unset {
             config.label_whitelist = None;
         }
 
-        config.write()?;
+        println!("{:?}", config);
 
         Ok(())
     }

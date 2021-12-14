@@ -41,7 +41,11 @@ impl Default {
         let fallback = whoami::username();
         let username = match &beam.user {
             Some(username) => username,
-            None => DEFAULT_PROFILE.config.username.as_ref().unwrap_or(&fallback),
+            None => DEFAULT_PROFILE
+                .config
+                .username
+                .as_ref()
+                .unwrap_or(&fallback),
         };
 
         clearscreen::clear()?;

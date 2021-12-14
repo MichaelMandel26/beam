@@ -1,8 +1,8 @@
 use anyhow::Result;
 use std::process::{Child, Command, ExitStatus};
 
-use crate::utils::spinner;
 use crate::utils::profile::DEFAULT_PROFILE;
+use crate::utils::spinner;
 
 pub fn is_logged_in() -> Result<bool> {
     let output = Command::new("tsh").args(["status"]).output()?;

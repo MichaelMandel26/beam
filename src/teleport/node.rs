@@ -44,7 +44,11 @@ impl SkimString for Vec<Node> {
         let mut nodes = self;
         nodes.sort_by(|a, b| b.spec.hostname.cmp(&a.spec.hostname));
 
-        let label_whitelist = DEFAULT_PROFILE.config.label_whitelist.clone().unwrap_or_default();
+        let label_whitelist = DEFAULT_PROFILE
+            .config
+            .label_whitelist
+            .clone()
+            .unwrap_or_default();
         // Generate skim item string
         for node in nodes {
             let mut label_string = String::new();

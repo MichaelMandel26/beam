@@ -1,7 +1,7 @@
 use anyhow::Result;
 use structopt::StructOpt;
 
-use crate::utils::config::Config;
+use crate::utils::profile::DEFAULT_PROFILE;
 
 #[derive(StructOpt, Debug)]
 pub struct Set {
@@ -23,7 +23,7 @@ pub struct Set {
 
 impl Set {
     pub fn run(&self) -> Result<()> {
-        let mut config = Config::get()?.unwrap_or_default();
+        let mut config = DEFAULT_PROFILE.config.clone();
 
         if let Some(username) = &self.username {
             config.username = Some(username.clone());
@@ -45,7 +45,7 @@ impl Set {
             config.label_whitelist = Some(label_whitelist.clone());
         }
 
-        config.write()?;
+        println!("{:?}", config);
 
         Ok(())
     }

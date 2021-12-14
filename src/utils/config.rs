@@ -1,17 +1,11 @@
-use std::{
-    fmt::{Display, Formatter},
-    io::Read,
-};
-
-use anyhow::Result;
-use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
+use std::fmt::{Display, Formatter};
 
 // lazy_static! {
 //     pub static ref CONFIG: Config = Config::get().unwrap_or_default().unwrap_or_default();
 // }
 
-#[derive(Debug, Serialize, Deserialize, Default)]
+#[derive(Debug, Serialize, Deserialize, Default, Clone, PartialEq, Eq)]
 pub struct Config {
     pub username: Option<String>,
     pub proxy: Option<String>,
