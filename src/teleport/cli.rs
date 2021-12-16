@@ -44,6 +44,12 @@ pub fn ls(format: Option<&String>) -> Result<String> {
 pub fn cmp_logged_in_proxy_with(proxy: &str) -> Result<bool> {
     let output = Command::new("tsh").args(["status"]).output()?;
     let stdout = String::from_utf8_lossy(&output.stdout);
-    let logged_in_proxy = stdout.lines().nth(2).unwrap().split_ascii_whitespace().nth(1).unwrap();
+    let logged_in_proxy = stdout
+        .lines()
+        .nth(2)
+        .unwrap()
+        .split_ascii_whitespace()
+        .nth(1)
+        .unwrap();
     Ok(proxy == logged_in_proxy)
 }

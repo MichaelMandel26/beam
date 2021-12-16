@@ -2,47 +2,29 @@ use anyhow::Result;
 use dialoguer::{theme::ColorfulTheme, Confirm, Input, MultiSelect, Select};
 use structopt::StructOpt;
 
-use crate::utils::{
-    config::Config,
-    profile::{Profile, Profiles},
-};
+use crate::utils::{config::Config, profile::Profile};
+
+pub mod default;
+pub mod profile;
 
 #[derive(Debug, StructOpt)]
-pub struct Configure {}
+pub struct Configure {
+    #[structopt(subcommand)]
+    command: Option<Command>,
+}
+
+#[derive(Debug, StructOpt)]
+pub enum Command {
+    /// Configure profile
+    Profile(profile::Profile),
+}
 
 impl Configure {
     pub fn run(&self) -> Result<()> {
-        let profiles = Profiles::get()?;
-
-        let mut profile = match profiles.len().cmp(&1) {
-            std::cmp::Ordering::Greater => {
-                let profile_names = profiles
-                    .iter()
-                    .map(|p| {
-                        if p.default {
-                            format!("{} (default)", p.name)
-                        } else {
-                            p.name.clone()
-                        }
-                    })
-                    .collect::<Vec<_>>();
-                let selection = Select::with_theme(&ColorfulTheme::default())
-                    .with_prompt("Please select the profile you want to configure")
-                    .default(0)
-                    .items(&profile_names[..])
-                    .interact()
-                    .unwrap();
-                profiles[selection].clone()
-            }
-            std::cmp::Ordering::Equal => profiles[0].clone(),
-            std::cmp::Ordering::Less => Configure::new_profile(true)?,
-        };
-
-        Configure::wizard(&mut profile.config)?;
-
-        Profiles::write(profile)?;
-
-        Ok(())
+        match &self.command {
+            Some(Command::Profile(cmd)) => cmd.run(),
+            None => default::Default::run(),
+        }
     }
 
     fn new_profile(force_default: bool) -> Result<Profile> {

@@ -13,7 +13,7 @@ pub struct List {
 impl List {
     pub fn run(&self, beam: &crate::cli::Beam) -> Result<()> {
         let profile = match &beam.profile.is_some() {
-            true => Profile::get(beam.profile.to_owned().unwrap())?,
+            true => Profile::get(beam.profile.as_ref().unwrap().as_str())?,
             false => DEFAULT_PROFILE.clone(),
         };
 
