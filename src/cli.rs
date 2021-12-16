@@ -32,7 +32,7 @@ pub struct Beam {
 #[derive(StructOpt, Debug)]
 pub enum Command {
     Connect(command::connect::Connect),
-    Config(command::config::Config),
+    // Config(command::config::Config),
     List(command::list::List),
     Completions(command::completions::Completions),
     Configure(command::configure::Configure),
@@ -54,7 +54,7 @@ impl Beam {
     pub fn execute_command(&self) -> Result<()> {
         match &self.cmd {
             Some(Command::Connect(command)) => command.run(self),
-            Some(Command::Config(command)) => command.run(),
+            // Some(Command::Config(command)) => command.run(),
             Some(Command::List(command)) => command.run(self),
             Some(Command::Completions(command)) => command.run(),
             Some(Command::Configure(command)) => command.run(),
