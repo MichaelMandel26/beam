@@ -9,6 +9,9 @@ use crate::command;
 #[derive(StructOpt, Debug)]
 #[structopt(name = "beam", about = "Easier connection to teleport hosts")]
 pub struct Beam {
+    #[structopt(short, long, help = "The profile to use")]
+    pub profile: Option<String>,
+
     #[structopt(
         short,
         long,
@@ -16,10 +19,10 @@ pub struct Beam {
     )]
     pub user: Option<String>,
 
-    #[structopt(short, long, help = "The proxy to use")]
+    #[structopt(long, help = "The proxy to use")]
     pub proxy: Option<String>,
 
-    #[structopt(short, long, help = "The auth to use")]
+    #[structopt(long, help = "The auth to use")]
     pub auth: Option<String>,
 
     #[structopt(short, long = "clear-cache", help = "Whether to clear the cache")]

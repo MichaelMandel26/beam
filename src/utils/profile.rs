@@ -95,4 +95,13 @@ impl Profile {
             config: config.unwrap_or_default(),
         }
     }
+
+    pub fn get(name: String) -> Result<Profile> {
+        let profiles = Profiles::get_profiles().unwrap();
+        let profile = profiles.profiles.get(&name);
+        match profile {
+            Some(profile) => Ok(profile.to_owned()),
+            None => Err(anyhow!("Could not find profile {}", name)),
+        }
+    }
 }
