@@ -1,7 +1,7 @@
 use anyhow::{anyhow, Context, Result};
 use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
-use std::collections::BTreeMap as Map;
+use std::{collections::BTreeMap as Map, process};
 
 use crate::utils::config::Config;
 
@@ -9,7 +9,13 @@ const BEAM_PROFILES_PATH: &str = ".beam/profiles.toml";
 
 lazy_static! {
     #[derive(Debug, PartialEq, Eq, Default)]
-    pub static ref DEFAULT_PROFILE: Profile = Profiles::get_default().unwrap();
+    pub static ref DEFAULT_PROFILE: Profile = match Profiles::get_default() {
+        Ok(profile) => profile,
+        Err(err) => {
+            println!("Error: {}", err);
+            process::exit(1);
+        }
+    };
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, Default)]
@@ -65,15 +71,21 @@ impl Profiles {
             .into_iter()
             .map(|(_, v)| v)
             .collect::<Vec<Profile>>();
+        Profiles::verify_default(&profiles)?;
         Ok(profiles)
     }
 
     pub fn get_default() -> Result<Profile> {
         let profiles = Profiles::get()?;
-        let default_profile = profiles.iter().find(|profile| profile.default);
-        match default_profile {
-            Some(profile) => Ok(profile.clone()),
-            None => Err(anyhow!("Could not find default profile")),
+        Profiles::verify_default(&profiles)
+    }
+
+    pub fn verify_default(profiles: &[Profile]) -> Result<Profile> {
+        let default_profiles_count = profiles.iter().filter(|profile| profile.default).count();
+        match default_profiles_count {
+            0 => Err(anyhow!("No default profile found. Please create a default profile.")),
+            1 => Ok(profiles.iter().find(|profile| profile.default).unwrap().clone()),
+            _ => Err(anyhow!("Multiple default profiles found. Please fix your profiles.toml")),
         }
     }
 }

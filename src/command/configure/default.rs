@@ -1,3 +1,5 @@
+use std::process;
+
 use anyhow::Result;
 use dialoguer::{theme::ColorfulTheme, Select};
 use structopt::StructOpt;
@@ -11,8 +13,13 @@ pub struct Default {}
 
 impl Default {
     pub fn run() -> Result<()> {
-        let profiles = Profiles::get()?;
-
+        let profiles = match Profiles::get() {
+            Ok(profiles) => profiles,
+            Err(err) => {
+                println!("Error: {}", err);
+                process::exit(1);
+            }
+        };
         let mut profile = match profiles.len().cmp(&1) {
             std::cmp::Ordering::Greater => {
                 let profile_names = profiles
