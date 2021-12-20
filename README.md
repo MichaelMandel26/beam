@@ -1,5 +1,6 @@
 # Beam
 [![Crates.io](https://img.shields.io/crates/v/beamcli)](https://crates.io/crates/beamcli)
+[![CI](https://github.com/MichaelMandel26/beam/actions/workflows/main.yml/badge.svg)](https://github.com/MichaelMandel26/beam/actions/workflows/main.yml)
 
 > Beam me up Ferris!
 
