@@ -51,7 +51,5 @@ pub fn cmp_logged_in_proxy_with(proxy: &str) -> Result<bool> {
         .split("//")
         .nth(1)
         .unwrap();
-    dbg!(&logged_in_proxy);
-    dbg!(&proxy);
     Ok(proxy == logged_in_proxy)
 }
