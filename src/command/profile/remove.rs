@@ -45,7 +45,12 @@ impl Remove {
                     .default(0)
                     .items(&profile_names)
                     .interact()?;
-                profile_names[profile_name].clone().split(' ').next().unwrap().to_owned()
+                profile_names[profile_name]
+                    .clone()
+                    .split(' ')
+                    .next()
+                    .unwrap()
+                    .to_owned()
             }
         };
 
@@ -55,7 +60,7 @@ impl Remove {
                 println!("Cannot remove default profile, there must be at least one profile");
                 process::exit(1);
             }
-            
+
             println!("You are trying to remove the default profile. Please select a new default profile first.");
             // Get profile names
             let mut profile_names = Profiles::get_names(&profiles)?;
