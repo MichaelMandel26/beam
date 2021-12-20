@@ -1,7 +1,6 @@
 use anyhow::Result;
 use structopt::StructOpt;
 
-use super::Configure;
 use crate::utils::profile::{self, Profiles};
 
 #[derive(StructOpt, Debug)]
@@ -14,10 +13,10 @@ impl Profile {
     pub fn run(&self) -> Result<()> {
         let mut profile = match self.profile.as_ref() {
             "default" => profile::DEFAULT_PROFILE.clone(),
-            "new" => Configure::new_profile(false)?,
+            "new" => profile::Profile::new_interactive(false)?,
             _ => profile::Profile::get(&self.profile)?,
         };
-        Configure::wizard(&mut profile.config)?;
+        profile::Profile::wizard(&mut profile.config)?;
         Profiles::write(profile)?;
         Ok(())
     }

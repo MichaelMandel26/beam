@@ -4,9 +4,7 @@ use anyhow::Result;
 use dialoguer::{theme::ColorfulTheme, Select};
 use structopt::StructOpt;
 
-use crate::utils::profile::Profiles;
-
-use super::Configure;
+use crate::{utils::profile::Profile, utils::profile::Profiles};
 
 #[derive(Debug, StructOpt)]
 pub struct Default {}
@@ -41,10 +39,10 @@ impl Default {
                 profiles[selection].clone()
             }
             std::cmp::Ordering::Equal => profiles[0].clone(),
-            std::cmp::Ordering::Less => Configure::new_profile(true)?,
+            std::cmp::Ordering::Less => Profile::new_interactive(true)?,
         };
 
-        Configure::wizard(&mut profile.config)?;
+        Profile::wizard(&mut profile.config)?;
 
         Profiles::write(profile)?;
 
