@@ -42,7 +42,9 @@ impl Default {
 
         let nodes = node::get(!beam.clear_cache, proxy)?;
 
-        let items = nodes.to_skim_string();
+        let label_whitelist = profile.config.label_whitelist;
+
+        let items = nodes.to_skim_string(label_whitelist);
 
         let selected_item = match skim::skim(items)? {
             Some(item) => item,

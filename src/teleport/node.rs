@@ -8,7 +8,7 @@ use crate::utils;
 use crate::utils::profile::DEFAULT_PROFILE;
 
 pub trait SkimString {
-    fn to_skim_string(self) -> String;
+    fn to_skim_string(self, label_whitelist: Option<Vec<String>>) -> String;
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -31,7 +31,7 @@ pub struct Spec {
 }
 
 impl SkimString for Vec<Node> {
-    fn to_skim_string(self) -> String {
+    fn to_skim_string(self, label_whitelist: Option<Vec<String>>) -> String {
         let mut skim_string = String::new();
         // Get longest hostname length
         let longest_hostname_length = self
@@ -44,11 +44,7 @@ impl SkimString for Vec<Node> {
         let mut nodes = self;
         nodes.sort_by(|a, b| b.spec.hostname.cmp(&a.spec.hostname));
 
-        let label_whitelist = DEFAULT_PROFILE
-            .config
-            .label_whitelist
-            .clone()
-            .unwrap_or_default();
+        let label_whitelist = label_whitelist.unwrap_or_default();
         // Generate skim item string
         for node in nodes {
             let mut label_string = String::new();

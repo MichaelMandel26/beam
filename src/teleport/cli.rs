@@ -46,10 +46,11 @@ pub fn cmp_logged_in_proxy_with(proxy: &str) -> Result<bool> {
     let stdout = String::from_utf8_lossy(&output.stdout);
     let logged_in_proxy = stdout
         .lines()
-        .nth(0)
+        .next()
         .unwrap()
-        .split("//")
-        .nth(1)
+        .split_ascii_whitespace()
+        .nth(3)
         .unwrap();
+    let proxy = format!("https://{}:443", proxy.split(':').next().unwrap());
     Ok(proxy == logged_in_proxy)
 }
