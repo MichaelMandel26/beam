@@ -46,10 +46,12 @@ pub fn cmp_logged_in_proxy_with(proxy: &str) -> Result<bool> {
     let stdout = String::from_utf8_lossy(&output.stdout);
     let logged_in_proxy = stdout
         .lines()
-        .nth(2)
+        .nth(0)
         .unwrap()
-        .split_ascii_whitespace()
+        .split("//")
         .nth(1)
         .unwrap();
+    dbg!(&logged_in_proxy);
+    dbg!(&proxy);
     Ok(proxy == logged_in_proxy)
 }
