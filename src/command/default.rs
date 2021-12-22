@@ -4,7 +4,7 @@ use structopt::StructOpt;
 use crate::ssh;
 use crate::teleport::node::SkimString;
 use crate::teleport::{cli, node};
-use crate::utils::profile::{Profile, DEFAULT_PROFILE};
+use crate::utils::profile::{Profile, Profiles, DEFAULT_PROFILE};
 use crate::utils::skim;
 
 #[derive(Debug, StructOpt)]
@@ -55,8 +55,15 @@ impl Default {
 
         let host = selected_item.split(' ').next().unwrap();
 
+        let matched_profile = Profiles::get_matching(host)?;
+
         clearscreen::clear()?;
-        ssh::connect::connect(&host.to_string(), user)?;
+        match matched_profile {
+            Some(profile) => {
+                ssh::connect::connect(&host.to_string(), profile.config.username.unwrap().as_ref())?
+            }
+            None => ssh::connect::connect(&host.to_string(), user)?,
+        };
 
         Ok(())
     }

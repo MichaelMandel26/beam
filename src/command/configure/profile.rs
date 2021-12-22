@@ -16,7 +16,7 @@ impl Profile {
             "new" => profile::Profile::new_interactive(false)?,
             _ => profile::Profile::get(&self.profile)?,
         };
-        profile::Profile::wizard(&mut profile.config)?;
+        profile::Profile::wizard(&mut profile)?;
         Profiles::write(profile)?;
         Ok(())
     }

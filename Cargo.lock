@@ -73,6 +73,7 @@ dependencies = [
  "indicatif",
  "itertools",
  "lazy_static",
+ "regex",
  "reqwest",
  "semver 1.0.4",
  "serde",

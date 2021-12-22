@@ -49,11 +49,11 @@ impl Add {
                         .with_prompt("Do you want this to be your new default profile?")
                         .interact()?
                 };
-                Profile::new(profile.to_owned(), default, Some(Config::default()))
+                Profile::new(profile.to_owned(), default, None, Some(Config::default()))
             }
             None => Profile::new_interactive(force_default)?,
         };
-        Profile::wizard(&mut profile.config)?;
+        Profile::wizard(&mut profile)?;
         Profiles::write(profile)?;
         Ok(())
     }

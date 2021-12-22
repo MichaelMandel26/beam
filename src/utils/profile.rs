@@ -1,6 +1,7 @@
 use anyhow::{anyhow, Context, Result};
 use dialoguer::{theme::ColorfulTheme, Confirm, Input, MultiSelect, Select};
 use lazy_static::lazy_static;
+use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::{collections::BTreeMap as Map, fs, process};
 
@@ -126,6 +127,19 @@ impl Profiles {
             })
             .collect::<Vec<_>>())
     }
+
+    pub fn get_matching(hostname: &str) -> Result<Option<Profile>> {
+        let profiles = Profiles::get()?;
+        for profile in profiles {
+            if profile.host_pattern.is_some() {
+                let regex = Regex::new(profile.host_pattern.as_ref().unwrap())?;
+                if regex.is_match(hostname) {
+                    return Ok(Some(profile));
+                }
+            }
+        }
+        Ok(None)
+    }
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, Default)]
@@ -133,15 +147,22 @@ pub struct Profile {
     #[serde(skip)]
     pub name: String,
     pub default: bool,
+    pub host_pattern: Option<String>,
     #[serde(flatten)]
     pub config: Config,
 }
 
 impl Profile {
-    pub fn new(name: String, default: bool, config: Option<Config>) -> Profile {
+    pub fn new(
+        name: String,
+        default: bool,
+        host_pattern: Option<String>,
+        config: Option<Config>,
+    ) -> Profile {
         Profile {
             name,
             default,
+            host_pattern,
             config: config.unwrap_or_default(),
         }
     }
@@ -178,14 +199,16 @@ impl Profile {
             true
         };
 
-        let profile = Profile::new(name, default, None);
+        let profile = Profile::new(name, default, None, None);
 
         Ok(profile)
     }
 
-    pub fn wizard(config: &mut Config) -> Result<()> {
+    pub fn wizard(profile: &mut Profile) -> Result<()> {
+        profile.host_pattern = Profile::host_pattern_wizard(&profile.host_pattern)?;
+
         // Proxy
-        let default_proxy = match &config.proxy {
+        let default_proxy = match &profile.config.proxy {
             Some(proxy) => proxy.to_owned(),
             None => "".to_string(),
         };
@@ -202,7 +225,7 @@ impl Profile {
         };
 
         // Username
-        let default_username = match &config.username {
+        let default_username = match &profile.config.username {
             Some(username) => username.to_owned(),
             None => whoami::username(),
         };
@@ -213,7 +236,7 @@ impl Profile {
             .interact_text()?;
 
         // Auth
-        let default_auth = match &config.auth {
+        let default_auth = match &profile.config.auth {
             Some(auth) => auth.to_owned(),
             None => "default".to_string(),
         };
@@ -224,7 +247,7 @@ impl Profile {
             .interact_text()?;
 
         // cache_ttl
-        let default_ttl = match &config.cache_ttl {
+        let default_ttl = match &profile.config.cache_ttl {
             Some(cache_ttl) => cache_ttl.to_string(),
             None => ((60 * 60 * 24) as u64).to_string(),
         };
@@ -235,7 +258,7 @@ impl Profile {
             .interact_text()?;
 
         // Label Whitelist
-        if let Some(label_whitelist) = &config.label_whitelist {
+        if let Some(label_whitelist) = &profile.config.label_whitelist {
             let should_edit_label_whitelist = Confirm::with_theme(&ColorfulTheme::default())
                 .with_prompt("Do you want to edit your label whitelist?")
                 .interact()?;
@@ -273,7 +296,7 @@ impl Profile {
                     }
                     _ => unreachable!(),
                 };
-                config.label_whitelist = if !new_label_whitelist.is_empty() {
+                profile.config.label_whitelist = if !new_label_whitelist.is_empty() {
                     Some(new_label_whitelist)
                 } else {
                     None
@@ -286,14 +309,14 @@ impl Profile {
 
             if should_activate_label_whitelist {
                 let labels = Profile::label_wizard()?;
-                config.label_whitelist = Some(labels);
+                profile.config.label_whitelist = Some(labels);
             }
         }
 
-        config.proxy = Some(proxy);
-        config.username = Some(username);
-        config.auth = if auth != "default" { Some(auth) } else { None };
-        config.cache_ttl = Some(cache_ttl.parse::<u64>()?);
+        profile.config.proxy = Some(proxy);
+        profile.config.username = Some(username);
+        profile.config.auth = if auth != "default" { Some(auth) } else { None };
+        profile.config.cache_ttl = Some(cache_ttl.parse::<u64>()?);
 
         Ok(())
     }
@@ -316,6 +339,34 @@ impl Profile {
             }
         }
         Ok(labels)
+    }
+
+    pub fn host_pattern_wizard(default: &Option<String>) -> Result<Option<String>> {
+        let confirmation_message = match default {
+            Some(default) => format!("Do you want to auto-select this profile, using a regex pattern on the hostname?\n Currently: {}", default),
+            None => "Do you want to auto-select this profile, using a regex pattern on the hostname?".to_string(),
+        };
+
+        let should_activate_profile_by_pattern = Confirm::with_theme(&ColorfulTheme::default())
+            .with_prompt(confirmation_message)
+            .interact()?;
+
+        let host_pattern = if should_activate_profile_by_pattern {
+            let host_pattern_input: String = match default {
+                Some(default_host_pattern) => Input::with_theme(&ColorfulTheme::default())
+                    .with_prompt("Regex Pattern for auto-selecting profile")
+                    .default(default_host_pattern.to_owned())
+                    .interact_text()?,
+                None => Input::with_theme(&ColorfulTheme::default())
+                    .with_prompt("Regex Pattern for auto-selecting profile")
+                    .interact_text()?,
+            };
+
+            Some(host_pattern_input)
+        } else {
+            None
+        };
+        Ok(host_pattern)
     }
 
     pub fn get(name: &str) -> Result<Profile> {

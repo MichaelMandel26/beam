@@ -42,7 +42,7 @@ impl Default {
             std::cmp::Ordering::Less => Profile::new_interactive(true)?,
         };
 
-        Profile::wizard(&mut profile.config)?;
+        Profile::wizard(&mut profile)?;
 
         Profiles::write(profile)?;
 
