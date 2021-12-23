@@ -9,6 +9,9 @@ use crate::command;
 #[derive(StructOpt, Debug)]
 #[structopt(name = "beam", about = "Easier connection to teleport hosts")]
 pub struct Beam {
+    #[structopt(short, long, help = "The profile to use")]
+    pub profile: Option<String>,
+
     #[structopt(
         short,
         long,
@@ -16,10 +19,10 @@ pub struct Beam {
     )]
     pub user: Option<String>,
 
-    #[structopt(short, long, help = "The proxy to use")]
+    #[structopt(long, help = "The proxy to use")]
     pub proxy: Option<String>,
 
-    #[structopt(short, long, help = "The auth to use")]
+    #[structopt(long, help = "The auth to use")]
     pub auth: Option<String>,
 
     #[structopt(short, long = "clear-cache", help = "Whether to clear the cache")]
@@ -32,9 +35,10 @@ pub struct Beam {
 #[derive(StructOpt, Debug)]
 pub enum Command {
     Connect(command::connect::Connect),
-    Config(command::config::Config),
+    Profile(command::profile::Profile),
     List(command::list::List),
     Completions(command::completions::Completions),
+    Configure(command::configure::Configure),
 }
 
 impl Beam {
@@ -53,9 +57,10 @@ impl Beam {
     pub fn execute_command(&self) -> Result<()> {
         match &self.cmd {
             Some(Command::Connect(command)) => command.run(self),
-            Some(Command::Config(command)) => command.run(),
+            Some(Command::Profile(command)) => command.run(),
             Some(Command::List(command)) => command.run(self),
             Some(Command::Completions(command)) => command.run(),
+            Some(Command::Configure(command)) => command.run(),
             None => command::default::Default::run(self),
         }
     }

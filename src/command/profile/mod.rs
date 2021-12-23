@@ -1,12 +1,11 @@
-mod get;
-mod set;
-mod unset;
+mod add;
+mod remove;
 
 use anyhow::Result;
 use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]
-pub struct Config {
+pub struct Profile {
     #[structopt(subcommand)]
     command: Command,
 }
@@ -14,19 +13,17 @@ pub struct Config {
 #[derive(Debug, StructOpt)]
 pub enum Command {
     /// Getting a configuration value
-    Get(get::Get),
+    Add(add::Add),
     /// Setting a configuration value
-    Set(set::Set),
-    /// Unsetting a configuration value
-    Unset(unset::Unset),
+    #[structopt(alias = "rm")]
+    Remove(remove::Remove),
 }
 
-impl Config {
+impl Profile {
     pub fn run(&self) -> Result<()> {
         match &self.command {
-            Command::Get(cmd) => cmd.run(),
-            Command::Set(cmd) => cmd.run(),
-            Command::Unset(cmd) => cmd.run(),
+            Command::Add(cmd) => cmd.run(),
+            Command::Remove(cmd) => cmd.run(),
         }
     }
 }

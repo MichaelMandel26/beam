@@ -1,13 +1,13 @@
-use crate::teleport::cli;
-use crate::utils;
-use crate::utils::config::CONFIG;
 use anyhow::Result;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, time::Duration};
 
+use crate::teleport::cli;
+use crate::utils::profile::DEFAULT_PROFILE;
+
 pub trait SkimString {
-    fn to_skim_string(self) -> String;
+    fn to_skim_string(self, label_whitelist: Option<Vec<String>>) -> String;
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -30,7 +30,7 @@ pub struct Spec {
 }
 
 impl SkimString for Vec<Node> {
-    fn to_skim_string(self) -> String {
+    fn to_skim_string(self, label_whitelist: Option<Vec<String>>) -> String {
         let mut skim_string = String::new();
         // Get longest hostname length
         let longest_hostname_length = self
@@ -43,7 +43,7 @@ impl SkimString for Vec<Node> {
         let mut nodes = self;
         nodes.sort_by(|a, b| b.spec.hostname.cmp(&a.spec.hostname));
 
-        let label_whitelist = CONFIG.label_whitelist.clone().unwrap_or_default();
+        let label_whitelist = label_whitelist.unwrap_or_default();
         // Generate skim item string
         for node in nodes {
             let mut label_string = String::new();
@@ -73,7 +73,7 @@ pub fn get(use_cache: bool, proxy: &str) -> Result<Vec<Node>> {
 
     let is_cache_file_old = if cache_file.exists() {
         let metadata = cache_file.metadata()?;
-        let ttl = CONFIG.cache_ttl.unwrap_or(60 * 60 * 24);
+        let ttl = DEFAULT_PROFILE.config.cache_ttl.unwrap_or(60 * 60 * 24);
         metadata.modified()?.elapsed()? > Duration::from_secs(ttl)
     } else {
         true
@@ -81,10 +81,7 @@ pub fn get(use_cache: bool, proxy: &str) -> Result<Vec<Node>> {
 
     let nodes: Vec<Node>;
     if !std::path::Path::new(&cache_file).exists() || is_cache_file_old || !use_cache {
-        let spinner = utils::spinner::get_spinner();
-        spinner.set_message("Getting nodes from teleport...");
         nodes = get_from_tsh(proxy)?;
-        spinner.finish_and_clear();
     } else {
         nodes = get_from_cache(proxy)?;
     }
