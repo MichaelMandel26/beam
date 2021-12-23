@@ -3,7 +3,7 @@ use structopt::StructOpt;
 
 use crate::ssh;
 use crate::teleport::{cli, node};
-use crate::utils::profile::{Profile, DEFAULT_PROFILE};
+use crate::utils::profile::{Profile, Profiles, DEFAULT_PROFILE};
 
 #[derive(Debug, StructOpt)]
 pub struct Connect {
@@ -15,7 +15,10 @@ impl Connect {
     pub fn run(&self, beam: &crate::cli::Beam) -> Result<()> {
         let profile = match &beam.profile.is_some() {
             true => Profile::get(beam.profile.as_ref().unwrap().as_str())?,
-            false => DEFAULT_PROFILE.clone(),
+            false => match Profiles::get_matching(&self.host)? {
+                Some(p) => p,
+                None => DEFAULT_PROFILE.clone(),
+            },
         };
 
         let proxy = match &beam.proxy {
