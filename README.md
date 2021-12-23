@@ -90,10 +90,12 @@ By default Beam caches the list of nodes it receives from Teleport for 24 hours.
 ```bash
 $ beam -c
 ```
-You can change the cache duration using the `--cache-ttl` flag.
+You can change the cache duration using the `Cache TTL` option.
 The following example will cache the list of nodes for 1 hour:
 ```bash
-$ beam config set --cache-ttl 3600
+$ beam configure
+...
+✔ Cache TTL · 3600
 ```
 
 ## Usage
