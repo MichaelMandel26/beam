@@ -325,11 +325,18 @@ impl Profile {
     pub fn label_wizard() -> Result<Vec<String>> {
         let mut labels = Vec::new();
         loop {
-            let label = Input::with_theme(&ColorfulTheme::default())
+            let label: String = Input::with_theme(&ColorfulTheme::default())
                 .with_prompt("Label")
                 .interact_text()?;
 
-            labels.push(label);
+            if !labels.contains(&label) {
+                labels.push(label);
+            } else {
+                println!(
+                    "Label {} is already whitelisted. Please try a different label",
+                    label.red()
+                );
+            }
 
             let add_another = Confirm::with_theme(&ColorfulTheme::default())
                 .with_prompt("Add another label?")
