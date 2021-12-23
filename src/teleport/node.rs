@@ -4,7 +4,6 @@ use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, time::Duration};
 
 use crate::teleport::cli;
-use crate::utils;
 use crate::utils::profile::DEFAULT_PROFILE;
 
 pub trait SkimString {
@@ -82,10 +81,7 @@ pub fn get(use_cache: bool, proxy: &str) -> Result<Vec<Node>> {
 
     let nodes: Vec<Node>;
     if !std::path::Path::new(&cache_file).exists() || is_cache_file_old || !use_cache {
-        let spinner = utils::spinner::get_spinner();
-        spinner.set_message("Getting nodes from teleport...");
         nodes = get_from_tsh(proxy)?;
-        spinner.finish_and_clear();
     } else {
         nodes = get_from_cache(proxy)?;
     }
