@@ -52,14 +52,10 @@ impl Connect {
         let fallback = whoami::username();
         let username = match &beam.user {
             Some(username) => username,
-            None => DEFAULT_PROFILE
-                .config
-                .username
-                .as_ref()
-                .unwrap_or(&fallback),
+            None => profile.config.username.as_ref().context("No username configured to login with. Please use --username or configure it using beam configure").unwrap_or(&fallback)
         };
 
-        clearscreen::clear()?;
+        //clearscreen::clear()?;
         ssh::connect::connect(&self.host, username)?;
 
         Ok(())
