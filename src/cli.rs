@@ -72,7 +72,7 @@ impl Beam {
                 "A new version of beam is available {} -> {}\nTo update run {}",
                 current_version.to_string().red(),
                 latest_version.to_string().green(),
-                "cargo install beam".green()
+                "cargo install beamcli".green()
             );
         }
         Ok(())
