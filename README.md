@@ -38,30 +38,51 @@ cargo install beamcli
 
 ## Configuration
 
-Before using Beam you will have to configure the Teleport proxy.
+Before using Beam you will have to configure a default profile.
 
 ```bash
-$ beam config set --proxy teleport.example.com
+$ beam configure
+✔ Profile name · myProfile
+✔ Do you want to auto-select this profile, using a regex pattern on the hostname? · no
+✔ Proxy · teleport.example.com
+✔ Username · dzefo
+✔ Authentication Method · default
+✔ Cache TTL · 86400
+✔ Do you want to only show specific labels? · no
 ```
 
-If you want to use SSO as your authentication method, you can configure it as well:
+If you want to use SSO as your authentication method, you will have to set `sso` for `Authentication Method`
+
+For only showing specific labels, you can set `yes` for `Do you want to only show specific labels?`
+```bash
+$ beam configure
+...
+✔ Do you want to only show specific labels? · yes
+✔ Label · env
+✔ Add another label? · yes
+✔ Label · application
+✔ Add another label? · no
+```
+
+### Pattern matching
+
+If you want to select a specific profile, for a set of hostnames, that match a specific pattern, you can specify `yes` for `Do you want to auto-select this profile, using a regex pattern on the hostname?`
 
 ```bash
-$ beam config set --auth sso
+$ beam configure
+Configuring profile dev-profile:
+✔ Do you want to auto-select this profile, using a regex pattern on the hostname? · yes
+✔ Regex Pattern for auto-selecting profile · \b(quality|staging)\b.*
+...
 ```
 
-Beam will automatically use the user, from which you are running the command, as the username for connecting to a host.
-To use a different user, you can use the `--user` flag, or configure a new default using the following command:
+Beam will then match any of the following hostnames:
+- quality.app.example.com
+- staging.app.example.com
 
-```bash
-$ beam config set --username myuser
-```
+If the hostname doesnt match any profile pattern, Beam will use the default profile.
 
-You can also specify a list of labels that will explicitly be shown. If you don't specify any, Beam will show all labels.
-
-```bash
-$ beam config set --label-whitelist environment application
-```
+> Important: Beam will only use the proxy from the default profile, when running the `beam` command, as it does not know the hostname, before selecting it. When using the `beam connect <hostname>` command, Beam will use the hostname from the command line and is able to use the proxy from the profile.
 
 ### Caching
 
@@ -93,7 +114,10 @@ host2.example.com
 ```bash
 $ beam connect server.example.com
 ```
-
+4. Manually selecting a profile to use
+```bash
+$ beam --profile myProfile
+```
 ### Search Syntax
 
 Beam uses skim under the hood for its fuzzy search. The syntax for searching is the same as for skim.
