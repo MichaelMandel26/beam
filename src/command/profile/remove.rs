@@ -1,6 +1,7 @@
 use std::process;
 
 use anyhow::Result;
+use colored::Colorize;
 use dialoguer::{theme::ColorfulTheme, Select};
 use structopt::StructOpt;
 
@@ -30,7 +31,7 @@ impl Remove {
         let profile_name = match &self.profile {
             Some(profile) => {
                 if !profiles.iter().any(|p| &p.name == profile) {
-                    println!("Profile with name {} does not exist", profile);
+                    println!("Profile with name {} does not exist", profile.red());
                     process::exit(1);
                 }
                 profile.to_owned()
@@ -87,7 +88,7 @@ impl Remove {
         let profiles: Profiles = profiles.into();
         match profiles.save() {
             Ok(_) => {
-                println!("Profile {} removed", profile_name);
+                println!("Profile {} removed", profile_name.green());
                 Ok(())
             }
             Err(err) => {

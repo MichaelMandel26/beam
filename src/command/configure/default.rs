@@ -1,6 +1,7 @@
 use std::process;
 
 use anyhow::Result;
+use colored::Colorize;
 use dialoguer::{theme::ColorfulTheme, Select};
 use structopt::StructOpt;
 
@@ -38,7 +39,11 @@ impl Default {
                     .unwrap();
                 profiles[selection].clone()
             }
-            std::cmp::Ordering::Equal => profiles[0].clone(),
+            std::cmp::Ordering::Equal => {
+                let profile = profiles[0].clone();
+                println!("Configuring profile {}: ", profile.name.green());
+                profile
+            }
             std::cmp::Ordering::Less => Profile::new_interactive(true)?,
         };
 

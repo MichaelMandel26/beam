@@ -1,4 +1,5 @@
 use anyhow::{anyhow, Context, Result};
+use colored::Colorize;
 use dialoguer::{theme::ColorfulTheme, Confirm, Input, MultiSelect, Select};
 use lazy_static::lazy_static;
 use regex::Regex;
@@ -176,7 +177,7 @@ impl Profile {
             }
         };
 
-        let name = loop {
+        let name: String = loop {
             let name = Input::with_theme(&ColorfulTheme::default())
                 .with_prompt("Profile name")
                 .interact_text()?;
@@ -186,7 +187,7 @@ impl Profile {
             } else {
                 println!(
                     "Profile with name {} already exists. Please try a different name",
-                    name
+                    name.red()
                 );
             }
         };

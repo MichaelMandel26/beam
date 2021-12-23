@@ -1,6 +1,7 @@
 use std::process;
 
 use anyhow::Result;
+use colored::Colorize;
 use dialoguer::{theme::ColorfulTheme, Confirm};
 use structopt::StructOpt;
 
@@ -32,7 +33,7 @@ impl Add {
         {
             println!(
                 "Profile with name {} already exists",
-                self.profile.as_ref().unwrap()
+                self.profile.as_ref().unwrap().red()
             );
             process::exit(1);
         }
