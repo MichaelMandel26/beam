@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{Context, Result};
 use reqwest::ClientBuilder;
 use semver::Version;
 
@@ -15,7 +15,7 @@ pub async fn get_latest_release() -> Result<Version> {
         .last()
         .ok_or(anyhow::anyhow!("Could not get latest release"))?;
 
-    Ok(Version::parse(&version_string[1..]).unwrap())
+    Version::parse(&version_string[1..]).context("Could not parse version string")
 }
 
 pub fn get_current_version() -> Version {
