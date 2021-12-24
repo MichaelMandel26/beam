@@ -36,6 +36,7 @@ pub struct Beam {
 pub enum Command {
     Connect(command::connect::Connect),
     Profile(command::profile::Profile),
+    #[structopt(alias = "ls")]
     List(command::list::List),
     Completions(command::completions::Completions),
     Configure(command::configure::Configure),
