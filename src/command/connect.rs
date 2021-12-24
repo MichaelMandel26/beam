@@ -55,7 +55,7 @@ impl Connect {
             None => profile.config.username.as_ref().context("No username configured to login with. Please use --username or configure it using beam configure").unwrap_or(&fallback)
         };
 
-        //clearscreen::clear()?;
+        clearscreen::clear()?;
         ssh::connect::connect(&self.host, username)?;
 
         Ok(())
