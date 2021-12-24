@@ -6,7 +6,7 @@ use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::{collections::BTreeMap as Map, fs, process};
 
-use crate::utils::config::Config;
+use crate::{command, utils::config::Config};
 
 const BEAM_PROFILES_PATH: &str = ".beam/profiles.toml";
 
@@ -15,8 +15,9 @@ lazy_static! {
     pub static ref DEFAULT_PROFILE: Profile = match Profiles::get_default() {
         Ok(profile) => profile,
         Err(err) => {
-            println!("Error: {}", err);
-            process::exit(1);
+            println!("{}", err);
+            command::configure::default::Default::run().unwrap();
+            Profiles::get_default().unwrap()
         }
     };
 }
