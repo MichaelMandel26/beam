@@ -6,7 +6,7 @@
 
 ## What is Beam?
 
-Beam an interface on top of the Teleport CLI. It uses skim, a fuzzy finder written in Rust, to provide a nice interface for searching and filtering.
+Beam is an interface on top of the Teleport CLI. It uses skim, a fuzzy finder written in Rust, to provide a nice interface for searching and filtering.
 
 ## Table of Contents
 - [Beam](#beam)
