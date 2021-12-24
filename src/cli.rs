@@ -50,7 +50,7 @@ impl Beam {
         self.execute_command()?;
 
         // Printing notification if the latest version is newer than the current version
-        Beam::check_for_update(latest_version.await??)?;
+        Beam::check_for_update(latest_version.await?)?;
         Ok(())
     }
 
@@ -65,15 +65,17 @@ impl Beam {
         }
     }
 
-    pub fn check_for_update(latest_version: Version) -> Result<()> {
+    pub fn check_for_update(latest_version: Result<Version>) -> Result<()> {
         let current_version = version::get_current_version();
-        if latest_version > current_version {
-            println!(
-                "A new version of beam is available {} -> {}\nTo update run {}",
-                current_version.to_string().red(),
-                latest_version.to_string().green(),
-                "cargo install beamcli".green()
-            );
+        if let Ok(latest_version) = latest_version {
+            if latest_version > current_version {
+                println!(
+                    "A new version of beam is available {} -> {}\nTo update run {}",
+                    current_version.to_string().red(),
+                    latest_version.to_string().green(),
+                    "cargo install beamcli".green()
+                );
+            }
         }
         Ok(())
     }
