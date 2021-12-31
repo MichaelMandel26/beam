@@ -18,7 +18,7 @@ impl Remove {
         let mut profiles = match Profiles::get() {
             Ok(profiles) => profiles,
             Err(err) => {
-                println!("Error: {}", err);
+                println!("{}", err);
                 process::exit(1);
             }
         };
@@ -92,7 +92,7 @@ impl Remove {
                 Ok(())
             }
             Err(err) => {
-                println!("Error: {}", err);
+                println!("{}", err);
                 process::exit(1);
             }
         }
