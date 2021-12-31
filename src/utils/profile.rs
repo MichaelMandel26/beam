@@ -173,7 +173,7 @@ impl Profile {
         let profiles = match Profiles::get() {
             Ok(profiles) => profiles,
             Err(err) => {
-                println!("Error: {}", err);
+                println!("{}", err);
                 process::exit(1);
             }
         };

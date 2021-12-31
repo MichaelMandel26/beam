@@ -4,7 +4,11 @@ use structopt::StructOpt;
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    Beam::from_args().run().await?;
-
-    Ok(())
+    match Beam::from_args().run().await {
+        Ok(_) => Ok(()),
+        Err(e) => {
+            eprintln!("{}", e);
+            std::process::exit(1);
+        }
+    }
 }

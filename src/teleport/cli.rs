@@ -1,10 +1,16 @@
 use anyhow::Result;
+use colored::Colorize;
 use std::process::{Child, Command, ExitStatus};
 
 use crate::utils::spinner;
 
 pub fn is_logged_in() -> Result<bool> {
-    let output = Command::new("tsh").args(["status"]).output()?;
+    let output = match Command::new("tsh").args(["status"]).output() {
+        Ok(output) => output,
+        Err(_) => {
+            return Err(anyhow::anyhow!("Unable to access the teleport cli.\nPlease make sure, that the teleport cli is installed and available in your PATH. For further information see the teleport documentation: https://goteleport.com/docs/installation/".red()));
+        }
+    };
     let stdout = String::from_utf8_lossy(&output.stdout);
     let is_logged_in = stdout.contains("valid for");
     Ok(is_logged_in)
