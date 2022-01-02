@@ -47,12 +47,7 @@ impl SkimString for Vec<Node> {
                 }
             }
 
-            skim_string += format!(
-                "{}\t{}\n",
-                node.spec.hostname,
-                label_string,
-            )
-            .as_str();
+            skim_string += format!("{}\t{}\n", node.spec.hostname, label_string,).as_str();
         }
 
         skim_string
