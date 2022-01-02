@@ -9,7 +9,6 @@ use skim::{
 pub fn skim(items: String) -> Result<Option<String>> {
     let options = SkimOptionsBuilder::default()
         .height(Some("100%"))
-        .delimiter(Some("\t"))
         .multi(true)
         .build()
         .unwrap();

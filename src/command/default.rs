@@ -53,7 +53,7 @@ impl Default {
             }
         };
 
-        let host = selected_item.split('\t').next().unwrap();
+        let host = selected_item.split(' ').next().unwrap();
         let matched_profile = Profiles::get_matching(host)?;
 
         clearscreen::clear()?;
