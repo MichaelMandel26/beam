@@ -32,12 +32,6 @@ pub struct Spec {
 impl SkimString for Vec<Node> {
     fn to_skim_string(self, label_whitelist: Option<Vec<String>>) -> String {
         let mut skim_string = String::new();
-        // Get longest hostname length
-        let longest_hostname_length = self
-            .iter()
-            .map(|node| node.spec.hostname.len())
-            .max()
-            .unwrap_or(0);
 
         // sort nodes by hostname reverse
         let mut nodes = self;
@@ -54,10 +48,9 @@ impl SkimString for Vec<Node> {
             }
 
             skim_string += format!(
-                "{:<width$} {}\n",
+                "{}\t{}\n",
                 node.spec.hostname,
                 label_string,
-                width = longest_hostname_length + 15
             )
             .as_str();
         }
