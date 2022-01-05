@@ -1,4 +1,5 @@
 use anyhow::{Context, Result};
+use colored::Colorize;
 use structopt::StructOpt;
 
 use crate::teleport::cli;
@@ -35,6 +36,8 @@ impl Login {
             if !exit_status.success() {
                 return Err(anyhow::anyhow!("Login failed"));
             }
+        } else {
+            println!("Already logged in with {}", proxy.green());
         }
 
         Ok(())
