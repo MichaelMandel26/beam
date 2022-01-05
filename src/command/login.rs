@@ -37,7 +37,7 @@ impl Login {
                 return Err(anyhow::anyhow!("Login failed"));
             }
         } else {
-            println!("Already logged in with {}", proxy.green());
+            println!("You are already logged in with {}", proxy.green());
         }
 
         Ok(())

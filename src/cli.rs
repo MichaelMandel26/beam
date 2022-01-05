@@ -41,6 +41,7 @@ pub enum Command {
     Completions(command::completions::Completions),
     Configure(command::configure::Configure),
     Login(command::login::Login),
+    Logout(command::logout::Logout),
 }
 
 impl Beam {
@@ -62,6 +63,7 @@ impl Beam {
             Some(Command::Profile(command)) => command.run(),
             Some(Command::List(command)) => command.run(self),
             Some(Command::Login(command)) => command.run(self),
+            Some(Command::Logout(command)) => command.run(),
             Some(Command::Completions(command)) => command.run(),
             Some(Command::Configure(command)) => command.run(),
             None => command::default::Default::run(self),

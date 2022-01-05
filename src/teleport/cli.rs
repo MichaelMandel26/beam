@@ -34,6 +34,11 @@ pub fn login(proxy: &str, auth: Option<&String>, user: &str) -> Result<ExitStatu
     process.wait().map_err(|e| anyhow::anyhow!(e))
 }
 
+pub fn logout() -> Result<ExitStatus> {
+    let mut process = Command::new("tsh").args(&["logout"]).spawn()?;
+    process.wait().map_err(|e| anyhow::anyhow!(e))
+}
+
 pub fn ls(format: Option<&String>) -> Result<String> {
     let format = match format {
         Some(format) => format,
