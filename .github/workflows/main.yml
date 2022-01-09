@@ -24,7 +24,7 @@ jobs:
           args: --all-features
       
       - name: Install codecov dependencies
-        run: sudo apt install -y inutils-dev libcurl4-openssl-dev zlib1g-dev libdw-dev libiberty-dev
+        run: sudo apt install -y binutils-dev libcurl4-openssl-dev zlib1g-dev libdw-dev libiberty-dev
 
       - name: Run tests for code coverage
         run: |
