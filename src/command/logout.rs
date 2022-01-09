@@ -1,6 +1,6 @@
 use anyhow::Result;
-use structopt::StructOpt;
 use colored::Colorize;
+use structopt::StructOpt;
 
 use crate::teleport::cli;
 

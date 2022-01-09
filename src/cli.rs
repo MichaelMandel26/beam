@@ -6,6 +6,8 @@ use structopt::StructOpt;
 
 use crate::command;
 
+const LATEST_RELEASE_URL: &str = "https://github.com/MichaelMandel26/beam/releases/latest";
+
 #[derive(StructOpt, Debug)]
 #[structopt(name = "beam", about = "Easier connection to teleport hosts")]
 pub struct Beam {
@@ -48,7 +50,8 @@ impl Beam {
     pub async fn run(&self) -> Result<()> {
         Beam::check_for_dot_beam_dir()?;
         // Asynchronously getting the latest version from GitHub
-        let latest_version = tokio::spawn(async move { version::get_latest_release().await });
+        let latest_version =
+            tokio::spawn(async move { version::get_latest_release(LATEST_RELEASE_URL).await });
 
         self.execute_command()?;
 
@@ -94,5 +97,14 @@ impl Beam {
         }
 
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn test_check_for_dot_beam_dir() {
+        assert!(Beam::check_for_dot_beam_dir().is_ok());
     }
 }
