@@ -15,6 +15,8 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
       - run: rustup component add clippy
       # Run clippy   
       - name: Run clippy
@@ -23,10 +25,13 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           args: --all-features
       
+      - name: Run tests
+        run: cargo test
+
       - name: Install codecov dependencies
         run: sudo apt install -y binutils-dev libcurl4-openssl-dev zlib1g-dev libdw-dev libiberty-dev
 
-      - name: Run tests for code coverage
+      - name: run code coverage
         run: |
           wget https://github.com/SimonKagstrom/kcov/archive/master.tar.gz &&
           tar xzf master.tar.gz &&
