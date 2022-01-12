@@ -53,8 +53,7 @@ mod tests {
 
     #[test]
     fn test_get_current_version() {
-        env::set_var("CARGO_PKG_VERSION", "0.2.8");
         let current_version = get_current_version();
-        assert_eq!(current_version, Version::parse("0.2.8").unwrap());
+        assert_eq!(current_version, Version::parse(env!("CARGO_PKG_VERSION")).unwrap());
     }
 }
