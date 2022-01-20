@@ -46,7 +46,7 @@ mod tests {
             get_latest_release(&server.url("/MichaelMandel26/beam/releases/latest"))
                 .await
                 .unwrap();
-    
+
         github_latest_mock.assert();
         assert_eq!(latest_version, Version::parse("0.2.8").unwrap());
     }
@@ -54,6 +54,9 @@ mod tests {
     #[test]
     fn test_get_current_version() {
         let current_version = get_current_version();
-        assert_eq!(current_version, Version::parse(env!("CARGO_PKG_VERSION")).unwrap());
+        assert_eq!(
+            current_version,
+            Version::parse(env!("CARGO_PKG_VERSION")).unwrap()
+        );
     }
 }
