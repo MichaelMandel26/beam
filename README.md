@@ -20,18 +20,29 @@ Beam is an interface on top of the Teleport CLI. It uses skim, a fuzzy finder wr
     + [Search Syntax](#search-syntax)
   * [Adding completions to your shell](#adding-completions-to-your-shell)
 
-
 ## Installation
 
-> Make sure that you have the [Teleport CLI](https://goteleport.com/docs/installation/) installed, before using Beam.
+### Through Brew
 
-For installing you will have to install Rust. [Rustup](https://rustup.rs/) is the recommended way to do that.  
-You can install beam through running:
+For installing Beam through Homebrew, run the following commands:
+
+```bash
+brew tap MichaelMandel26/beamcli
+brew install beam
+```
+
+> This will also automatically install the [Teleport CLI](https://goteleport.com/docs/installation/), as it is a dependency of Beam.
+
+### Through Cargo
+
+> Make sure that you have the [Teleport CLI](https://goteleport.com/docs/installation/) installed, before using Beam through cargo.
+
+For installing Beam through cargo you will have to install Rust. [Rustup](https://rustup.rs/) is the recommended way to do that.  
+You can then install it through running:
 
 ```bash
 cargo install beamcli
 ```
-
 
 ## Configuration
 
