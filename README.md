@@ -31,7 +31,7 @@ brew tap MichaelMandel26/beamcli
 brew install beam
 ```
 
-> This will also automatically install teleport, as it is a dependency of Beam.
+> This will also automatically install the [Teleport CLI](https://goteleport.com/docs/installation/), as it is a dependency of Beam.
 
 ### Through Cargo
 
