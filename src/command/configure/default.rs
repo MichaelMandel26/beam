@@ -5,7 +5,7 @@ use colored::Colorize;
 use dialoguer::{theme::ColorfulTheme, Select};
 use structopt::StructOpt;
 
-use crate::{utils::profile::Profile, utils::profile::Profiles};
+use crate::utils::{profile::Profile, profiles::Profiles};
 
 #[derive(Debug, StructOpt)]
 pub struct Default {}

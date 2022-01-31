@@ -7,4 +7,8 @@ pub struct Config {
     pub auth: Option<String>,
     pub cache_ttl: Option<u64>,
     pub label_whitelist: Option<Vec<String>>,
+    // pub enable_port_forwarding: Option<bool>,
+    // pub listen_port: Option<u16>,
+    // pub remote_port: Option<u16>,
+    // pub remote_host: Option<String>,
 }

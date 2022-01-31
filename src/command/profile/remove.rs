@@ -5,7 +5,7 @@ use colored::Colorize;
 use dialoguer::{theme::ColorfulTheme, Select};
 use structopt::StructOpt;
 
-use crate::utils::profile::Profiles;
+use crate::utils::profiles::Profiles;
 
 #[derive(StructOpt, Debug)]
 pub struct Remove {

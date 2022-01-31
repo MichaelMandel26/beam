@@ -4,7 +4,8 @@ use structopt::StructOpt;
 use crate::ssh;
 use crate::teleport::node::SkimString;
 use crate::teleport::{cli, node};
-use crate::utils::profile::{Profile, Profiles, DEFAULT_PROFILE};
+use crate::utils::profile::Profile;
+use crate::utils::profiles::{Profiles, DEFAULT_PROFILE};
 use crate::utils::skim;
 
 #[derive(Debug, StructOpt)]

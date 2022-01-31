@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, time::Duration};
 
 use crate::teleport::cli;
-use crate::utils::profile::DEFAULT_PROFILE;
+use crate::utils::profiles::DEFAULT_PROFILE;
 
 pub trait SkimString {
     fn to_skim_string(self, label_whitelist: Option<Vec<String>>) -> String;
