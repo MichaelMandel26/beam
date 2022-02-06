@@ -132,8 +132,7 @@ impl Profiles {
             .collect::<Vec<_>>())
     }
 
-    pub fn get_matching(hostname: &str) -> Result<Option<Profile>> {
-        let profiles = Profiles::get()?;
+    pub fn get_matching(hostname: &str, profiles: Vec<Profile>) -> Result<Option<Profile>> {
         for profile in profiles {
             if profile.host_pattern.is_some() {
                 let regex = Regex::new(profile.host_pattern.as_ref().unwrap())?;
@@ -213,7 +212,7 @@ mod tests {
     }
 
     #[test]
-    fn test_get_names () {
+    fn test_get_names() {
         let profiles = [
             Profile {
                 name: "test".to_owned(),
@@ -240,11 +239,46 @@ mod tests {
                 host_pattern: None,
             },
         ];
-        let expected_names = vec![
-            "test (default)",
-            "test2",
-        ];
+        let expected_names = vec!["test (default)", "test2"];
         assert_eq!(Profiles::get_names(&profiles).unwrap(), expected_names);
         assert_eq!(Profiles::get_names(&[]).unwrap(), Vec::<String>::from([]));
+    }
+
+    #[test]
+    fn test_get_matching() {
+        let hostname = "quality.app.example.com";
+        let expected_profile = Profile {
+            name: "test".to_owned(),
+            config: Config {
+                username: Some("test".to_owned()),
+                auth: Some("test".to_owned()),
+                proxy: Some("test".to_owned()),
+                cache_ttl: Some(60),
+                label_whitelist: Some(vec!["test".to_owned()]),
+            },
+            default: true,
+            host_pattern: Some(r#"\b(quality|staging)\b.*"#.to_string()),
+        };
+        let profiles = [
+            expected_profile.clone(),
+            Profile {
+                name: "test2".to_owned(),
+                config: Config {
+                    username: Some("test2".to_owned()),
+                    auth: Some("test2".to_owned()),
+                    proxy: Some("test2".to_owned()),
+                    cache_ttl: Some(60),
+                    label_whitelist: Some(vec!["test2".to_owned()]),
+                },
+                default: false,
+                host_pattern: Some(r#"\b(dev|prod)\b.*"#.to_string()),
+            },
+        ];
+        assert_eq!(
+            expected_profile,
+            Profiles::get_matching(hostname, profiles.to_vec())
+                .unwrap()
+                .unwrap()
+        );
     }
 }

@@ -6,7 +6,7 @@ use std::process;
 
 use crate::utils::{config::Config, profiles::Profiles};
 
-#[derive(Debug, Deserialize, Serialize, Clone, Default)]
+#[derive(Debug, Deserialize, Serialize, Clone, Default, PartialEq, Eq)]
 pub struct Profile {
     #[serde(skip)]
     pub name: String,

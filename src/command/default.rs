@@ -55,7 +55,8 @@ impl Default {
         };
 
         let host = selected_item.split(' ').next().unwrap();
-        let matched_profile = Profiles::get_matching(host)?;
+        let profiles = Profiles::get()?;
+        let matched_profile = Profiles::get_matching(host, profiles)?;
 
         clearscreen::clear()?;
         match matched_profile {
