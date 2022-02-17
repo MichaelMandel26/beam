@@ -43,7 +43,7 @@ impl Default {
 
         let nodes = node::get(!beam.clear_cache, proxy)?;
 
-        let label_whitelist = profile.config.label_whitelist;
+        let label_whitelist = profile.config.label_whitelist.clone();
 
         let items = nodes.to_skim_string(label_whitelist);
 
@@ -60,10 +60,12 @@ impl Default {
 
         clearscreen::clear()?;
         match matched_profile {
-            Some(profile) => {
-                ssh::connect::connect(&host.to_string(), profile.config.username.unwrap().as_ref())?
-            }
-            None => ssh::connect::connect(&host.to_string(), user)?,
+            Some(matched_profile) => ssh::connect::connect(
+                &host.to_string(),
+                matched_profile.config.username.as_ref().unwrap(),
+                &matched_profile,
+            )?,
+            None => ssh::connect::connect(&host.to_string(), user, &profile)?,
         };
 
         Ok(())

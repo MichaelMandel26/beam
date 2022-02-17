@@ -61,7 +61,7 @@ impl Connect {
         };
 
         clearscreen::clear()?;
-        ssh::connect::connect(&self.host, username)?;
+        ssh::connect::connect(&self.host, username, &profile)?;
 
         Ok(())
     }
