@@ -9,16 +9,23 @@
 
 Beam is an interface on top of the Teleport CLI. It uses skim, a fuzzy finder written in Rust, to provide a nice interface for searching and filtering.
 
-## Table of Contents
+# Table of contents
+
 - [Beam](#beam)
-  * [What is Beam?](#what-is-beam-)
-  * [Table of Contents](#table-of-contents)
-  * [Installation](#installation)
-  * [Configuration](#configuration)
-    + [Caching](#caching)
-  * [Usage](#usage)
-    + [Search Syntax](#search-syntax)
-  * [Adding completions to your shell](#adding-completions-to-your-shell)
+  - [What is Beam?](#what-is-beam)
+  - [Table of Contents](#table-of-contents)
+  - [Installation](#installation)
+    - [Through Brew](#through-brew)
+    - [Through Cargo](#through-cargo)
+  - [Configuration](#configuration)
+    - [Pattern matching](#pattern-matching)
+    - [Caching](#caching)
+    - [Port forwarding](#port-forwarding)
+  - [Usage](#usage)
+    - [Search Syntax](#search-syntax)
+  - [Adding completions to your shell](#adding-completions-to-your-shell)
+
+
 
 ## Installation
 
@@ -104,6 +111,35 @@ The following example will cache the list of nodes for 1 hour:
 $ beam configure
 ...
 ✔ Cache TTL · 3600
+```
+
+### Port forwarding
+
+If you want to forward a specifc port to your localhost, you can add the following attributes to one of your profiles. 
+
+```toml
+[profile.mysql]
+...
+enable_port_forwarding = true
+listen_port = 3306
+remote_host = "127.0.0.1"
+remote_port = 3306
+```
+
+using this feature you could for example forward the port `3306` every time you connect to a node containing the word `mysql`. This would enable you to inspect a database running on the node using a database management desktop application
+
+```toml
+[profile.mysql]
+default = false
+proxy = "teleport.example.com"
+username = "firstname.lastname"
+auth = "sso"
+cache_ttl = 86400
+enable_port_forwarding = true
+host_pattern = "(._mysql._)"
+listen_port = 3306
+remote_host = "127.0.0.1"
+remote_port = 3306
 ```
 
 ## Usage
