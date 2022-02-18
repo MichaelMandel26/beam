@@ -1,7 +1,8 @@
 use anyhow::Result;
 use structopt::StructOpt;
 
-use crate::utils::profile::{self, Profiles};
+use crate::utils::profile;
+use crate::utils::profiles::{Profiles, DEFAULT_PROFILE};
 
 #[derive(StructOpt, Debug)]
 pub struct Profile {
@@ -12,7 +13,7 @@ pub struct Profile {
 impl Profile {
     pub fn run(&self) -> Result<()> {
         let mut profile = match self.profile.as_ref() {
-            "default" => profile::DEFAULT_PROFILE.clone(),
+            "default" => DEFAULT_PROFILE.clone(),
             "new" => profile::Profile::new_interactive(false)?,
             _ => profile::Profile::get(&self.profile)?,
         };

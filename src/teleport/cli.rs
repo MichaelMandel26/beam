@@ -61,7 +61,13 @@ pub fn cmp_logged_in_proxy_with(proxy: &str) -> Result<bool> {
         .unwrap()
         .split_ascii_whitespace()
         .nth(3)
+        .unwrap()
+        .split(':')
+        .nth(1)
+        .unwrap()
+        .split("//")
+        .nth(1)
         .unwrap();
-    let proxy = format!("https://{}:443", proxy.split(':').next().unwrap());
+    let proxy = proxy.split(':').next().unwrap();
     Ok(proxy == logged_in_proxy)
 }

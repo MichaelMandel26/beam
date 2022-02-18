@@ -3,7 +3,8 @@ use colored::Colorize;
 use structopt::StructOpt;
 
 use crate::teleport::cli;
-use crate::utils::profile::{Profile, DEFAULT_PROFILE};
+use crate::utils::profile::Profile;
+use crate::utils::profiles::DEFAULT_PROFILE;
 
 #[derive(Debug, StructOpt)]
 pub struct Login {}

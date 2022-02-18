@@ -3,7 +3,8 @@ use structopt::StructOpt;
 
 use crate::ssh;
 use crate::teleport::{cli, node};
-use crate::utils::profile::{Profile, Profiles, DEFAULT_PROFILE};
+use crate::utils::profile::Profile;
+use crate::utils::profiles::{Profiles, DEFAULT_PROFILE};
 
 #[derive(Debug, StructOpt)]
 pub struct Connect {
@@ -15,10 +16,13 @@ impl Connect {
     pub fn run(&self, beam: &crate::cli::Beam) -> Result<()> {
         let profile = match &beam.profile.is_some() {
             true => Profile::get(beam.profile.as_ref().unwrap().as_str())?,
-            false => match Profiles::get_matching(&self.host)? {
-                Some(p) => p,
-                None => DEFAULT_PROFILE.clone(),
-            },
+            false => {
+                let profiles = Profiles::get()?;
+                match Profiles::get_matching(&self.host, profiles)? {
+                    Some(p) => p,
+                    None => DEFAULT_PROFILE.clone(),
+                }
+            }
         };
 
         let proxy = match &beam.proxy {
@@ -43,6 +47,7 @@ impl Connect {
                 return Err(anyhow::anyhow!("Login failed"));
             }
         }
+
         let nodes = node::get(!beam.clear_cache, proxy)?;
         ensure!(
             nodes.iter().any(|node| node.spec.hostname == self.host),
@@ -56,7 +61,7 @@ impl Connect {
         };
 
         clearscreen::clear()?;
-        ssh::connect::connect(&self.host, username)?;
+        ssh::connect::connect(&self.host, username, &profile)?;
 
         Ok(())
     }

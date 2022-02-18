@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, time::Duration};
 
 use crate::teleport::cli;
-use crate::utils::profile::DEFAULT_PROFILE;
+use crate::utils::profiles::DEFAULT_PROFILE;
 
 pub trait SkimString {
     fn to_skim_string(self, label_whitelist: Option<Vec<String>>) -> String;
@@ -91,8 +91,12 @@ pub fn get(use_cache: bool, proxy: &str) -> Result<Vec<Node>> {
 
 fn get_from_tsh(proxy: &str) -> Result<Vec<Node>> {
     let tsh_json = cli::ls(Some(&"json".to_string()))?;
+    if tsh_json == "null\n" {
+        return Err(anyhow::anyhow!(
+            "This proxy does not seem to have any nodes"
+        ));
+    }
     let tsh_nodes: Vec<Node> = serde_json::from_str(&tsh_json)?;
-
     write_to_cache(tsh_json, proxy)?;
 
     Ok(tsh_nodes)
