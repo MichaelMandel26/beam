@@ -26,6 +26,16 @@ pub struct Profiles {
     pub profiles: Map<String, Profile>,
 }
 
+impl From<Profiles> for Vec<Profile> {
+    fn from(profiles: Profiles) -> Self {
+        profiles
+            .profiles
+            .into_iter()
+            .map(|(_, v)| v)
+            .collect::<Vec<Profile>>()
+    }
+}
+
 impl Profiles {
     pub fn write(profile: Profile) -> Result<()> {
         let mut profiles = Profiles::get_profiles().unwrap_or_default();
@@ -81,11 +91,7 @@ impl Profiles {
         let profiles_map = Profiles::get_profiles();
         match profiles_map {
             Ok(profiles_map) => {
-                let profiles = profiles_map
-                    .profiles
-                    .into_iter()
-                    .map(|(_, v)| v)
-                    .collect::<Vec<Profile>>();
+                let profiles: Vec<Profile> = profiles_map.into();
                 Profiles::verify_profiles_integrity(&profiles)?;
                 Ok(profiles)
             }
@@ -133,15 +139,28 @@ impl Profiles {
     }
 
     pub fn get_matching(hostname: &str, profiles: Vec<Profile>) -> Result<Option<Profile>> {
+        let mut matched_profiles = vec![];
+
         for profile in profiles {
             if profile.host_pattern.is_some() {
                 let regex = Regex::new(profile.host_pattern.as_ref().unwrap())?;
                 if regex.is_match(hostname) {
-                    return Ok(Some(profile));
+                    matched_profiles.push(profile);
                 }
             }
         }
-        Ok(None)
+
+        matched_profiles = matched_profiles
+            .into_iter()
+            .filter(|profile| profile.priority.is_some())
+            .collect();
+        matched_profiles.sort_by(|a, b| a.priority.cmp(&b.priority));
+
+        Ok(if matched_profiles.is_empty() {
+            None
+        } else {
+            Some(matched_profiles[0].clone())
+        })
     }
 }
 
@@ -156,6 +175,7 @@ mod tests {
         let valid_profiles = [
             Profile {
                 name: "test".to_owned(),
+                priority: Some(0),
                 config: Config {
                     username: Some("test".to_owned()),
                     auth: Some("test".to_owned()),
@@ -172,6 +192,7 @@ mod tests {
             },
             Profile {
                 name: "test2".to_owned(),
+                priority: Some(1),
                 config: Config {
                     username: Some("test2".to_owned()),
                     auth: Some("test2".to_owned()),
@@ -190,6 +211,7 @@ mod tests {
         let invalid_profiles = [
             Profile {
                 name: "test".to_owned(),
+                priority: Some(1),
                 config: Config {
                     username: Some("test".to_owned()),
                     auth: Some("test".to_owned()),
@@ -206,6 +228,7 @@ mod tests {
             },
             Profile {
                 name: "test2".to_owned(),
+                priority: Some(0),
                 config: Config {
                     username: Some("test2".to_owned()),
                     auth: Some("test2".to_owned()),
@@ -232,6 +255,7 @@ mod tests {
         let profiles = [
             Profile {
                 name: "test".to_owned(),
+                priority: Some(1),
                 config: Config {
                     username: Some("test".to_owned()),
                     auth: Some("test".to_owned()),
@@ -248,6 +272,7 @@ mod tests {
             },
             Profile {
                 name: "test2".to_owned(),
+                priority: Some(0),
                 config: Config {
                     username: Some("test2".to_owned()),
                     auth: Some("test2".to_owned()),
@@ -273,6 +298,7 @@ mod tests {
         let hostname = "quality.app.example.com";
         let expected_profile = Profile {
             name: "test".to_owned(),
+            priority: Some(0),
             config: Config {
                 username: Some("test".to_owned()),
                 auth: Some("test".to_owned()),
@@ -291,6 +317,7 @@ mod tests {
             expected_profile.clone(),
             Profile {
                 name: "test2".to_owned(),
+                priority: Some(0),
                 config: Config {
                     username: Some("test2".to_owned()),
                     auth: Some("test2".to_owned()),
@@ -304,6 +331,40 @@ mod tests {
                 },
                 default: false,
                 host_pattern: Some(r#"\b(dev|prod)\b.*"#.to_string()),
+            },
+            Profile {
+                name: "test3".to_owned(),
+                priority: Some(1),
+                config: Config {
+                    username: Some("test3".to_owned()),
+                    auth: Some("test3".to_owned()),
+                    proxy: Some("test3".to_owned()),
+                    cache_ttl: Some(60),
+                    label_whitelist: Some(vec!["test3".to_owned()]),
+                    enable_port_forwarding: Some(false),
+                    listen_port: None,
+                    remote_port: None,
+                    remote_host: None,
+                },
+                default: false,
+                host_pattern: Some(r#"\b(quality|staging)\b.*"#.to_string()),
+            },
+            Profile {
+                name: "test4".to_owned(),
+                priority: None,
+                config: Config {
+                    username: Some("test4".to_owned()),
+                    auth: Some("test4".to_owned()),
+                    proxy: Some("test4".to_owned()),
+                    cache_ttl: Some(60),
+                    label_whitelist: Some(vec!["test4".to_owned()]),
+                    enable_port_forwarding: Some(false),
+                    listen_port: None,
+                    remote_port: None,
+                    remote_host: None,
+                },
+                default: false,
+                host_pattern: Some(r#"\b(quality|staging)\b.*"#.to_string()),
             },
         ];
         assert_eq!(
