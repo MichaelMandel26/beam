@@ -96,7 +96,7 @@ Beam will then match any of the following hostnames:
 - quality.app.example.com
 - staging.app.example.com
 
-In case there are be multiple profiles that match the pattern, Beam will select the profile with the lowest priority number. You can configure the priority number for each profile by adding a `priority` property to the profile in your `profile.toml` file.  
+In case there are be multiple profiles that have a matching pattern, Beam will select the profile with the lowest priority number. You can configure the priority number for each profile by adding a `priority` property to the profile in your `profile.toml` file.  
 Profiles without a priority number will only be selected, if there is no other matching profile, having a priority defined.
 
 If the hostname doesnt match any profile pattern, Beam will use the default profile.
