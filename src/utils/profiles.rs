@@ -374,4 +374,93 @@ mod tests {
                 .unwrap()
         );
     }
+
+    #[test]
+    fn test_from_profiles() {
+        let profiles = Profiles {
+            profiles: Map::from([
+                (
+                    "test".to_string(),
+                    Profile {
+                        name: "test".to_owned(),
+                        priority: Some(0),
+                        config: Config {
+                            username: Some("test".to_owned()),
+                            auth: Some("test".to_owned()),
+                            proxy: Some("test".to_owned()),
+                            cache_ttl: Some(60),
+                            label_whitelist: Some(vec!["test".to_owned()]),
+                            enable_port_forwarding: Some(false),
+                            listen_port: None,
+                            remote_port: None,
+                            remote_host: None,
+                        },
+                        default: true,
+                        host_pattern: Some(r#"\b(quality|staging)\b.*"#.to_string()),
+                    },
+                ),
+                (
+                    "test2".to_string(),
+                    Profile {
+                        name: "test2".to_owned(),
+                        priority: Some(0),
+                        config: Config {
+                            username: Some("test2".to_owned()),
+                            auth: Some("test2".to_owned()),
+                            proxy: Some("test2".to_owned()),
+                            cache_ttl: Some(60),
+                            label_whitelist: Some(vec!["test2".to_owned()]),
+                            enable_port_forwarding: Some(false),
+                            listen_port: None,
+                            remote_port: None,
+                            remote_host: None,
+                        },
+                        default: false,
+                        host_pattern: Some(r#"\b(quality|staging)\b.*"#.to_string()),
+                    },
+                ),
+            ]),
+        };
+
+        let expected_profile_vec = vec![
+            Profile {
+                name: "test".to_owned(),
+                priority: Some(0),
+                config: Config {
+                    username: Some("test".to_owned()),
+                    auth: Some("test".to_owned()),
+                    proxy: Some("test".to_owned()),
+                    cache_ttl: Some(60),
+                    label_whitelist: Some(vec!["test".to_owned()]),
+                    enable_port_forwarding: Some(false),
+                    listen_port: None,
+                    remote_port: None,
+                    remote_host: None,
+                },
+                default: true,
+                host_pattern: Some(r#"\b(quality|staging)\b.*"#.to_string()),
+            },
+            Profile {
+                name: "test2".to_owned(),
+                priority: Some(0),
+                config: Config {
+                    username: Some("test2".to_owned()),
+                    auth: Some("test2".to_owned()),
+                    proxy: Some("test2".to_owned()),
+                    cache_ttl: Some(60),
+                    label_whitelist: Some(vec!["test2".to_owned()]),
+                    enable_port_forwarding: Some(false),
+                    listen_port: None,
+                    remote_port: None,
+                    remote_host: None,
+                },
+                default: false,
+                host_pattern: Some(r#"\b(quality|staging)\b.*"#.to_string()),
+            },
+        ];
+
+        let profile_vec: Vec<Profile> = profiles.into();
+
+        assert_eq!(expected_profile_vec, profile_vec);
+    }
 }
