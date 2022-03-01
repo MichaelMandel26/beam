@@ -1,6 +1,6 @@
 use anyhow::Result;
 use colored::Colorize;
-use std::process::{Child, Command, ExitStatus};
+use std::process::{Command, ExitStatus};
 
 use crate::utils::spinner;
 
@@ -29,8 +29,7 @@ pub fn login(proxy: &str, auth: Option<&String>, user: &str) -> Result<ExitStatu
         args.push(auth_args.as_str());
     }
 
-    let mut process: Child;
-    process = Command::new("tsh").args(args).spawn()?;
+    let mut process = Command::new("tsh").args(args).spawn()?;
     process.wait().map_err(|e| anyhow::anyhow!(e))
 }
 

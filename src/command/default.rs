@@ -61,11 +61,11 @@ impl Default {
         clearscreen::clear()?;
         match matched_profile {
             Some(matched_profile) => ssh::connect::connect(
-                &host.to_string(),
+                host,
                 matched_profile.config.username.as_ref().unwrap(),
                 &matched_profile,
             )?,
-            None => ssh::connect::connect(&host.to_string(), user, &profile)?,
+            None => ssh::connect::connect(host, user, &profile)?,
         };
 
         Ok(())

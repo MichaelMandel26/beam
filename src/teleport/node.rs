@@ -80,12 +80,12 @@ pub fn get(use_cache: bool, proxy: &str) -> Result<Vec<Node>> {
         true
     };
 
-    let nodes: Vec<Node>;
-    if !std::path::Path::new(&cache_file).exists() || is_cache_file_old || !use_cache {
-        nodes = get_from_tsh(proxy)?;
+    let nodes = if !std::path::Path::new(&cache_file).exists() || is_cache_file_old || !use_cache {
+        get_from_tsh(proxy)?
     } else {
-        nodes = get_from_cache(proxy)?;
-    }
+        get_from_cache(proxy)?
+    };
+
     Ok(nodes)
 }
 
