@@ -150,17 +150,23 @@ impl Profiles {
             }
         }
 
-        matched_profiles = matched_profiles
-            .into_iter()
-            .filter(|profile| profile.priority.is_some())
-            .collect();
-        matched_profiles.sort_by(|a, b| a.priority.cmp(&b.priority));
+        match matched_profiles.len() {
+            0 => Ok(None),
+            1 => Ok(Some(matched_profiles[0].clone())),
+            _ => {
+                matched_profiles = matched_profiles
+                    .into_iter()
+                    .filter(|profile| profile.priority.is_some())
+                    .collect();
+                matched_profiles.sort_by(|a, b| a.priority.cmp(&b.priority));
 
-        Ok(if matched_profiles.is_empty() {
-            None
-        } else {
-            Some(matched_profiles[0].clone())
-        })
+                Ok(if matched_profiles.is_empty() {
+                    None
+                } else {
+                    Some(matched_profiles[0].clone())
+                })
+            }
+        }
     }
 }
 
@@ -294,7 +300,7 @@ mod tests {
     }
 
     #[test]
-    fn test_get_matching() {
+    fn test_get_matching_with_priority() {
         let hostname = "quality.app.example.com";
         let expected_profile = Profile {
             name: "test".to_owned(),
@@ -365,6 +371,54 @@ mod tests {
                 },
                 default: false,
                 host_pattern: Some(r#"\b(quality|staging)\b.*"#.to_string()),
+            },
+        ];
+        assert_eq!(
+            expected_profile,
+            Profiles::get_matching(hostname, profiles.to_vec())
+                .unwrap()
+                .unwrap()
+        );
+    }
+
+    #[test]
+    fn test_get_matching_without_priority() {
+        let hostname = "quality.app.example.com";
+        let expected_profile = Profile {
+            name: "test".to_owned(),
+            priority: None,
+            config: Config {
+                username: Some("test".to_owned()),
+                auth: Some("test".to_owned()),
+                proxy: Some("test".to_owned()),
+                cache_ttl: Some(60),
+                label_whitelist: Some(vec!["test".to_owned()]),
+                enable_port_forwarding: Some(false),
+                listen_port: None,
+                remote_port: None,
+                remote_host: None,
+            },
+            default: true,
+            host_pattern: Some(r#"\b(quality|staging)\b.*"#.to_string()),
+        };
+        let profiles = [
+            expected_profile.clone(),
+            Profile {
+                name: "test2".to_owned(),
+                priority: None,
+                config: Config {
+                    username: Some("test2".to_owned()),
+                    auth: Some("test2".to_owned()),
+                    proxy: Some("test2".to_owned()),
+                    cache_ttl: Some(60),
+                    label_whitelist: Some(vec!["test2".to_owned()]),
+                    enable_port_forwarding: Some(false),
+                    listen_port: None,
+                    remote_port: None,
+                    remote_host: None,
+                },
+                default: false,
+                host_pattern: Some(r#"\b(dev|prod)\b.*"#.to_string()),
             },
         ];
         assert_eq!(
