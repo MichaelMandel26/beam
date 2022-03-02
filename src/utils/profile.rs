@@ -12,6 +12,7 @@ pub struct Profile {
     pub name: String,
     pub default: bool,
     pub host_pattern: Option<String>,
+    pub priority: Option<i32>,
     #[serde(flatten)]
     pub config: Config,
 }
@@ -27,6 +28,7 @@ impl Profile {
             name,
             default,
             host_pattern,
+            priority: None,
             config: config.unwrap_or_default(),
         }
     }

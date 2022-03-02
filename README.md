@@ -1,4 +1,5 @@
 # Beam
+
 [![Crates.io](https://img.shields.io/crates/v/beamcli)](https://crates.io/crates/beamcli)
 [![CI](https://github.com/MichaelMandel26/beam/actions/workflows/main.yml/badge.svg)](https://github.com/MichaelMandel26/beam/actions/workflows/main.yml)
 [![codecov](https://codecov.io/gh/MichaelMandel26/beam/branch/main/graph/badge.svg?token=QAYMC9JTCZ)](https://codecov.io/gh/MichaelMandel26/beam)
@@ -24,8 +25,6 @@ Beam is an interface on top of the Teleport CLI. It uses skim, a fuzzy finder wr
   - [Usage](#usage)
     - [Search Syntax](#search-syntax)
   - [Adding completions to your shell](#adding-completions-to-your-shell)
-
-
 
 ## Installation
 
@@ -69,6 +68,7 @@ $ beam configure
 If you want to use SSO as your authentication method, you will have to set `sso` for `Authentication Method`
 
 For only showing specific labels, you can set `yes` for `Do you want to only show specific labels?`
+
 ```bash
 $ beam configure
 ...
@@ -92,8 +92,12 @@ Configuring profile dev-profile:
 ```
 
 Beam will then match any of the following hostnames:
+
 - quality.app.example.com
 - staging.app.example.com
+
+In case there are be multiple profiles that have a matching pattern, Beam will select the profile with the lowest priority number. You can configure the priority number for each profile by adding a `priority` property to the profile in your `profile.toml` file.  
+Profiles without a priority number will only be selected, if there is no other matching profile, having a priority defined.
 
 If the hostname doesnt match any profile pattern, Beam will use the default profile.
 
@@ -102,11 +106,14 @@ If the hostname doesnt match any profile pattern, Beam will use the default prof
 ### Caching
 
 By default Beam caches the list of nodes it receives from Teleport for 24 hours. To avoid using cache you can use the `--clear-cache` or `-c` flag:
+
 ```bash
 $ beam -c
 ```
+
 You can change the cache duration using the `Cache TTL` option.
 The following example will cache the list of nodes for 1 hour:
+
 ```bash
 $ beam configure
 ...
@@ -115,7 +122,7 @@ $ beam configure
 
 ### Port forwarding
 
-If you want to forward a specifc port to your localhost, you can add the following attributes to one of your profiles. 
+If you want to forward a specifc port to your localhost, you can add the following attributes to one of your profiles.
 
 ```toml
 [profile.mysql]
@@ -147,30 +154,38 @@ remote_port = 3306
 A few useful Beam commands:
 
 1. Opening a fuzzy finder view for selecting a host:
+
 ```bash
 $ beam
 ```
+
 2. Listing the names of all available nodes
+
 ```bash
 $ beam list --format names
 host1.example.com
 host2.example.com
 ```
+
 3. Directly connect to a host via its hostname
+
 ```bash
 $ beam connect server.example.com
 ```
+
 4. Manually selecting a profile to use
+
 ```bash
 $ beam --profile myProfile
 ```
+
 ### Search Syntax
 
 Beam uses skim under the hood for its fuzzy search. The syntax for searching is the same as for skim.
 See [skim](https://github.com/lotabout/skim) for more information.
 
 | Token    | Match type                 | Description                       |
-|----------|----------------------------|-----------------------------------|
+| -------- | -------------------------- | --------------------------------- |
 | `text`   | fuzzy-match                | items that match `text`           |
 | `^music` | prefix-exact-match         | items that start with `music`     |
 | `.mp3$`  | suffix-exact-match         | items that end with `.mp3`        |
@@ -181,12 +196,11 @@ See [skim](https://github.com/lotabout/skim) for more information.
 `skim` also supports the combination of tokens.
 
 - Whitespace has the meaning of `AND`. With the term `src main`, `skim` will search
-    for items that match **both** `src` and `main`.
-- ` | ` means `OR` (note the spaces around `|`). With the term `.md$ |
-    .markdown$`, `skim` will search for items ends with either `.md` or
-    `.markdown`.
+  for items that match **both** `src` and `main`.
+- `|` means `OR` (note the spaces around `|`). With the term `.md$ | .markdown$`, `skim` will search for items ends with either `.md` or
+  `.markdown`.
 - `OR` has higher precedence. So `readme .md$ | .markdown$` is grouped into
-    `readme AND (.md$ OR .markdown$)`.
+  `readme AND (.md$ OR .markdown$)`.
 
 ## Adding completions to your shell
 
