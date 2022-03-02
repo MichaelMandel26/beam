@@ -430,6 +430,79 @@ mod tests {
     }
 
     #[test]
+    fn test_get_matching_without_priority_multiple_matching() {
+        let hostname = "quality.app.example.com";
+        let expected_result: Option<Profile> = None;
+        let profiles = [
+            Profile {
+                name: "test".to_owned(),
+                priority: None,
+                config: Config {
+                    username: Some("test".to_owned()),
+                    auth: Some("test".to_owned()),
+                    proxy: Some("test".to_owned()),
+                    cache_ttl: Some(60),
+                    label_whitelist: Some(vec!["test".to_owned()]),
+                    enable_port_forwarding: Some(false),
+                    listen_port: None,
+                    remote_port: None,
+                    remote_host: None,
+                },
+                default: true,
+                host_pattern: Some(r#"\b(quality|staging)\b.*"#.to_string()),
+            },
+            Profile {
+                name: "test2".to_owned(),
+                priority: None,
+                config: Config {
+                    username: Some("test2".to_owned()),
+                    auth: Some("test2".to_owned()),
+                    proxy: Some("test2".to_owned()),
+                    cache_ttl: Some(60),
+                    label_whitelist: Some(vec!["test2".to_owned()]),
+                    enable_port_forwarding: Some(false),
+                    listen_port: None,
+                    remote_port: None,
+                    remote_host: None,
+                },
+                default: false,
+                host_pattern: Some(r#"\b(quality|staging)\b.*"#.to_string()),
+            },
+        ];
+        assert_eq!(
+            expected_result,
+            Profiles::get_matching(hostname, profiles.to_vec()).unwrap()
+        );
+    }
+
+    #[test]
+    fn test_get_matching_no_match() {
+        let hostname = "quality.app.example.com";
+        let expected_result: Option<Profile> = None;
+        let profiles = [Profile {
+            name: "test".to_owned(),
+            priority: None,
+            config: Config {
+                username: Some("test".to_owned()),
+                auth: Some("test".to_owned()),
+                proxy: Some("test".to_owned()),
+                cache_ttl: Some(60),
+                label_whitelist: Some(vec!["test".to_owned()]),
+                enable_port_forwarding: Some(false),
+                listen_port: None,
+                remote_port: None,
+                remote_host: None,
+            },
+            default: false,
+            host_pattern: Some(r#"\b(dev|prod)\b.*"#.to_string()),
+        }];
+        assert_eq!(
+            expected_result,
+            Profiles::get_matching(hostname, profiles.to_vec()).unwrap()
+        );
+    }
+
+    #[test]
     fn test_from_profiles() {
         let profiles = Profiles {
             profiles: Map::from([
