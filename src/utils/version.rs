@@ -11,7 +11,7 @@ pub async fn get_latest_release(url: &str) -> Result<Version> {
         .path_segments()
         .unwrap()
         .last()
-        .ok_or(anyhow::anyhow!("Could not get latest release"))?;
+        .ok_or_else(|| anyhow::anyhow!("Could not parse version string"))?;
 
     Version::parse(&version_string[1..]).context("Could not parse version string")
 }
