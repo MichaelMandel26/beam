@@ -3,6 +3,7 @@ use std::process;
 use anyhow::Result;
 use colored::Colorize;
 use dialoguer::{theme::ColorfulTheme, Select};
+use rayon::prelude::*;
 use structopt::StructOpt;
 
 use crate::utils::{profile::Profile, profiles::Profiles};
@@ -22,7 +23,7 @@ impl Default {
         let mut profile = match profiles.len().cmp(&1) {
             std::cmp::Ordering::Greater => {
                 let profile_names = profiles
-                    .iter()
+                    .par_iter()
                     .map(|p| {
                         if p.default {
                             format!("{} (default)", p.name)

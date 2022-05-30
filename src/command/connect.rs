@@ -1,4 +1,5 @@
 use anyhow::{ensure, Context, Result};
+use rayon::prelude::*;
 use structopt::StructOpt;
 
 use crate::ssh;
@@ -50,7 +51,7 @@ impl Connect {
 
         let nodes = node::get(!beam.clear_cache, proxy)?;
         ensure!(
-            nodes.iter().any(|node| node.spec.hostname == self.host),
+            nodes.par_iter().any(|node| node.spec.hostname == self.host),
             "Host not found in teleport"
         );
 

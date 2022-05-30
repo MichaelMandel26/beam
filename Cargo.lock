@@ -259,6 +259,7 @@ dependencies = [
  "indicatif",
  "itertools",
  "lazy_static",
+ "rayon",
  "regex",
  "reqwest",
  "semver 1.0.9",

@@ -1,5 +1,6 @@
 use anyhow::{anyhow, Context, Result};
 use lazy_static::lazy_static;
+use rayon::prelude::*;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::{collections::BTreeMap as Map, fs};
@@ -30,7 +31,7 @@ impl From<Profiles> for Vec<Profile> {
     fn from(profiles: Profiles) -> Self {
         profiles
             .profiles
-            .into_iter()
+            .into_par_iter()
             .map(|(_, v)| v)
             .collect::<Vec<Profile>>()
     }
@@ -109,14 +110,17 @@ impl Profiles {
             return Err(anyhow!("No profiles found"));
         }
 
-        let default_profiles_count = profiles.iter().filter(|profile| profile.default).count();
+        let default_profiles_count = profiles
+            .par_iter()
+            .filter(|profile| profile.default)
+            .count();
         match default_profiles_count {
             0 => Err(anyhow!(
                 "No default profile found. Please create a default profile."
             )),
             1 => Ok(profiles
-                .iter()
-                .find(|profile| profile.default)
+                .par_iter()
+                .find_any(|profile| profile.default)
                 .unwrap()
                 .clone()),
             _ => Err(anyhow!(
@@ -127,7 +131,7 @@ impl Profiles {
 
     pub fn get_names(profiles: &[Profile]) -> Result<Vec<String>> {
         Ok(profiles
-            .iter()
+            .par_iter()
             .map(|p| {
                 if p.default {
                     format!("{} (default)", p.name)
@@ -155,7 +159,7 @@ impl Profiles {
             1 => Ok(Some(matched_profiles[0].clone())),
             _ => {
                 matched_profiles = matched_profiles
-                    .into_iter()
+                    .into_par_iter()
                     .filter(|profile| profile.priority.is_some())
                     .collect();
                 matched_profiles.sort_by(|a, b| a.priority.cmp(&b.priority));

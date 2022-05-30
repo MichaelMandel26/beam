@@ -3,6 +3,7 @@ use std::process;
 use anyhow::Result;
 use colored::Colorize;
 use dialoguer::{theme::ColorfulTheme, Confirm};
+use rayon::prelude::*;
 use structopt::StructOpt;
 
 use crate::utils::{config::Config, profile::Profile, profiles::Profiles};
@@ -25,7 +26,7 @@ impl Add {
 
         if self.profile.is_some()
             && profiles
-                .iter()
+                .par_iter()
                 .any(|p| &p.name == self.profile.as_ref().unwrap())
         {
             println!(

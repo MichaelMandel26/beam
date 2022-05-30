@@ -3,6 +3,7 @@ use std::process;
 use anyhow::Result;
 use colored::Colorize;
 use dialoguer::{theme::ColorfulTheme, Select};
+use rayon::prelude::*;
 use structopt::StructOpt;
 
 use crate::utils::profiles::Profiles;
@@ -30,7 +31,7 @@ impl Remove {
 
         let profile_name = match &self.profile {
             Some(profile) => {
-                if !profiles.iter().any(|p| &p.name == profile) {
+                if !profiles.par_iter().any(|p| &p.name == profile) {
                     println!("Profile with name {} does not exist", profile.red());
                     process::exit(1);
                 }
@@ -55,7 +56,9 @@ impl Remove {
             }
         };
 
-        let is_default_profile = profiles.iter().any(|p| p.name == profile_name && p.default);
+        let is_default_profile = profiles
+            .par_iter()
+            .any(|p| p.name == profile_name && p.default);
         if is_default_profile {
             if profiles.len() == 1 {
                 println!("Cannot remove default profile, there must be at least one profile");
@@ -76,7 +79,7 @@ impl Remove {
             let new_default_name = profile_names[new_default_name_selection].clone();
 
             // Set new default profile
-            profiles.iter_mut().for_each(|p| {
+            profiles.par_iter_mut().for_each(|p| {
                 if p.name == new_default_name {
                     p.default = true;
                 }

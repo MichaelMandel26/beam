@@ -1,5 +1,6 @@
 use anyhow::Result;
 use itertools::Itertools;
+use rayon::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, time::Duration};
 
@@ -35,7 +36,7 @@ impl SkimString for Vec<Node> {
 
         // Get longest hostname length
         let longest_hostname_length = self
-            .iter()
+            .par_iter()
             .map(|node| node.spec.hostname.len())
             .max()
             .unwrap_or(0);

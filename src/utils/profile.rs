@@ -1,6 +1,7 @@
 use anyhow::{anyhow, Result};
 use colored::Colorize;
 use dialoguer::{theme::ColorfulTheme, Confirm, Input, MultiSelect, Select};
+use rayon::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::process;
 
@@ -47,7 +48,7 @@ impl Profile {
                 .with_prompt("Profile name")
                 .interact_text()?;
 
-            if !profiles.iter().any(|p| p.name == name) {
+            if !profiles.par_iter().any(|p| p.name == name) {
                 break name;
             } else {
                 println!(
@@ -153,7 +154,7 @@ impl Profile {
                     .interact()
                     .unwrap();
                         let new_label_whitelist: Vec<String> = label_whitelist
-                            .iter()
+                            .par_iter()
                             .enumerate()
                             .filter(|(i, _)| selections.contains(i))
                             .map(|(i, _)| label_whitelist[i].clone())
@@ -255,7 +256,7 @@ impl Profile {
 impl From<Vec<Profile>> for Profiles {
     fn from(profiles: Vec<Profile>) -> Self {
         let profile_map = profiles
-            .into_iter()
+            .into_par_iter()
             .map(|profile| (profile.name.to_owned(), profile))
             .collect();
         Profiles {
