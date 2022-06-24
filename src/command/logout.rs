@@ -1,10 +1,10 @@
 use anyhow::Result;
+use clap::Parser;
 use colored::Colorize;
-use structopt::StructOpt;
 
 use crate::teleport::cli;
 
-#[derive(Debug, StructOpt)]
+#[derive(Debug, Parser)]
 pub struct Logout {}
 
 impl Logout {

@@ -1,24 +1,43 @@
+use std::io;
+
 use crate::cli::Beam;
 use anyhow::{anyhow, Result};
-use structopt::{clap::Shell, StructOpt};
+use clap::{IntoApp, Parser};
+use clap_complete::{generate, Shell};
 
-#[derive(Debug, StructOpt)]
+#[derive(Debug, Parser)]
 pub struct Completions {
-    #[structopt(help = "The shell to generate completions for")]
+    #[clap(help = "The shell to generate completions for")]
     shell: String,
 }
 
 impl Completions {
     pub fn run(&self) -> Result<()> {
+        let cmd = &mut Beam::command();
         match self.shell.as_str() {
             "bash" => {
-                Beam::clap().gen_completions_to("beam", Shell::Bash, &mut std::io::stdout());
+                generate(
+                    Shell::Bash,
+                    cmd,
+                    cmd.get_name().to_string(),
+                    &mut io::stdout(),
+                );
             }
             "fish" => {
-                Beam::clap().gen_completions_to("beam", Shell::Fish, &mut std::io::stdout());
+                generate(
+                    Shell::Fish,
+                    cmd,
+                    cmd.get_name().to_string(),
+                    &mut io::stdout(),
+                );
             }
             "zsh" => {
-                Beam::clap().gen_completions_to("beam", Shell::Zsh, &mut std::io::stdout());
+                generate(
+                    Shell::Zsh,
+                    cmd,
+                    cmd.get_name().to_string(),
+                    &mut io::stdout(),
+                );
             }
             _ => {
                 return Err(anyhow!("Unsupported shell: {}", self.shell));

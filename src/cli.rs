@@ -1,40 +1,40 @@
 use crate::utils::version;
 use anyhow::Result;
+use clap::Parser;
 use colored::Colorize;
 use semver::Version;
-use structopt::StructOpt;
 
 use crate::command;
 
 const LATEST_RELEASE_URL: &str = "https://github.com/MichaelMandel26/beam/releases/latest";
 
-#[derive(StructOpt, Debug)]
-#[structopt(name = "beam", about = "Easier connection to teleport hosts")]
+#[derive(Parser, Debug)]
+#[clap(name = "beam", about = "Easier connection to teleport hosts")]
 pub struct Beam {
-    #[structopt(short, long, help = "The profile to use")]
+    #[clap(short, long, help = "The profile to use")]
     pub profile: Option<String>,
 
-    #[structopt(
+    #[clap(
         short,
         long,
         help = "The user which will be used to connect to the host. (default is the current system user)"
     )]
     pub user: Option<String>,
 
-    #[structopt(long, help = "The proxy to use")]
+    #[clap(long, help = "The proxy to use")]
     pub proxy: Option<String>,
 
-    #[structopt(long, help = "The auth to use")]
+    #[clap(long, help = "The auth to use")]
     pub auth: Option<String>,
 
-    #[structopt(short, long = "clear-cache", help = "Whether to clear the cache")]
+    #[clap(short, long = "clear-cache", help = "Whether to clear the cache")]
     pub clear_cache: bool,
 
-    #[structopt(subcommand)]
+    #[clap(subcommand)]
     pub cmd: Option<Command>,
 }
 
-#[derive(StructOpt, Debug)]
+#[derive(Parser, Debug)]
 pub enum Command {
     Connect(command::connect::Connect),
     Profile(command::profile::Profile),

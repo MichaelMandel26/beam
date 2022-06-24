@@ -1,12 +1,12 @@
 use anyhow::Result;
-use structopt::StructOpt;
+use clap::Parser;
 
 use crate::utils::profile;
 use crate::utils::profiles::{Profiles, DEFAULT_PROFILE};
 
-#[derive(StructOpt, Debug)]
+#[derive(Parser, Debug)]
 pub struct Profile {
-    #[structopt(help = "The profile to configure")]
+    #[clap(help = "The profile to configure")]
     profile: String,
 }
 

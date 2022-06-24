@@ -1,14 +1,14 @@
 use anyhow::{ensure, Context, Result};
-use structopt::StructOpt;
+use clap::Parser;
 
 use crate::ssh;
 use crate::teleport::{cli, node};
 use crate::utils::profile::Profile;
 use crate::utils::profiles::{Profiles, DEFAULT_PROFILE};
 
-#[derive(Debug, StructOpt)]
+#[derive(Debug, Parser)]
 pub struct Connect {
-    #[structopt(help = "The host to connect to")]
+    #[clap(help = "The host to connect to")]
     host: String,
 }
 

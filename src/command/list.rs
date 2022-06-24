@@ -1,13 +1,13 @@
 use anyhow::{Context, Result};
-use structopt::StructOpt;
+use clap::Parser;
 
 use crate::teleport::cli;
 use crate::utils::profile::Profile;
 use crate::utils::profiles::DEFAULT_PROFILE;
 
-#[derive(Debug, StructOpt)]
+#[derive(Debug, Parser)]
 pub struct List {
-    #[structopt(short, long, help = "The format to use for the output")]
+    #[clap(short, long, help = "The format to use for the output")]
     format: Option<String>,
 }
 
