@@ -1,12 +1,12 @@
 use anyhow::{Context, Result};
+use clap::Parser;
 use colored::Colorize;
-use structopt::StructOpt;
 
 use crate::teleport::cli;
 use crate::utils::profile::Profile;
 use crate::utils::profiles::DEFAULT_PROFILE;
 
-#[derive(Debug, StructOpt)]
+#[derive(Debug, Parser)]
 pub struct Login {}
 
 impl Login {

@@ -1,16 +1,16 @@
 use anyhow::Result;
-use structopt::StructOpt;
+use clap::Parser;
 
 pub mod default;
 pub mod profile;
 
-#[derive(Debug, StructOpt)]
+#[derive(Debug, Parser)]
 pub struct Configure {
-    #[structopt(subcommand)]
+    #[clap(subcommand)]
     command: Option<Command>,
 }
 
-#[derive(Debug, StructOpt)]
+#[derive(Debug, Parser)]
 pub enum Command {
     /// Configure profile
     Profile(profile::Profile),

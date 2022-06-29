@@ -1,5 +1,5 @@
 use anyhow::{Context, Result};
-use structopt::StructOpt;
+use clap::Parser;
 
 use crate::ssh;
 use crate::teleport::node::SkimString;
@@ -8,7 +8,7 @@ use crate::utils::profile::Profile;
 use crate::utils::profiles::{Profiles, DEFAULT_PROFILE};
 use crate::utils::skim;
 
-#[derive(Debug, StructOpt)]
+#[derive(Debug, Parser)]
 pub struct Default {}
 
 impl Default {

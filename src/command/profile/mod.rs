@@ -2,20 +2,20 @@ mod add;
 mod remove;
 
 use anyhow::Result;
-use structopt::StructOpt;
+use clap::Parser;
 
-#[derive(Debug, StructOpt)]
+#[derive(Debug, Parser)]
 pub struct Profile {
-    #[structopt(subcommand)]
+    #[clap(subcommand)]
     command: Command,
 }
 
-#[derive(Debug, StructOpt)]
+#[derive(Debug, Parser)]
 pub enum Command {
     /// Getting a configuration value
     Add(add::Add),
     /// Setting a configuration value
-    #[structopt(alias = "rm")]
+    #[clap(alias = "rm")]
     Remove(remove::Remove),
 }
 

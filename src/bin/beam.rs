@@ -1,6 +1,6 @@
 use anyhow::Result;
 use beamcli::cli::Beam;
-use structopt::StructOpt;
+use clap::Parser;
 
 #[tokio::main]
 async fn main() -> Result<()> {

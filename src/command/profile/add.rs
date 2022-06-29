@@ -1,15 +1,15 @@
 use std::process;
 
 use anyhow::Result;
+use clap::Parser;
 use colored::Colorize;
 use dialoguer::{theme::ColorfulTheme, Confirm};
-use structopt::StructOpt;
 
 use crate::utils::{config::Config, profile::Profile, profiles::Profiles};
 
-#[derive(StructOpt, Debug)]
+#[derive(Parser, Debug)]
 pub struct Add {
-    #[structopt(help = "The profile to configure")]
+    #[clap(help = "The profile to configure")]
     profile: Option<String>,
 }
 

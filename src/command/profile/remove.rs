@@ -1,15 +1,15 @@
 use std::process;
 
 use anyhow::Result;
+use clap::Parser;
 use colored::Colorize;
 use dialoguer::{theme::ColorfulTheme, Select};
-use structopt::StructOpt;
 
 use crate::utils::profiles::Profiles;
 
-#[derive(StructOpt, Debug)]
+#[derive(Parser, Debug)]
 pub struct Remove {
-    #[structopt(help = "The profile to remove")]
+    #[clap(help = "The profile to remove")]
     profile: Option<String>,
 }
 

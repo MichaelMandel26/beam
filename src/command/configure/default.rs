@@ -1,13 +1,13 @@
 use std::process;
 
 use anyhow::Result;
+use clap::Parser;
 use colored::Colorize;
 use dialoguer::{theme::ColorfulTheme, Select};
-use structopt::StructOpt;
 
 use crate::utils::{profile::Profile, profiles::Profiles};
 
-#[derive(Debug, StructOpt)]
+#[derive(Debug, Parser)]
 pub struct Default {}
 
 impl Default {
