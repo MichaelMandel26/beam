@@ -9,7 +9,7 @@ use crate::command;
 const LATEST_RELEASE_URL: &str = "https://github.com/MichaelMandel26/beam/releases/latest";
 
 #[derive(Parser, Debug)]
-#[clap(name = "beam", about = "Easier connection to teleport hosts")]
+#[clap(name = "beam", about = "Easier connection to teleport hosts", version)]
 pub struct Beam {
     #[clap(short, long, help = "The profile to use")]
     pub profile: Option<String>,
