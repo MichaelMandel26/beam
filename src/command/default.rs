@@ -58,7 +58,6 @@ impl Default {
         let profiles = Profiles::get()?;
         let matched_profile = Profiles::get_matching(host, profiles)?;
 
-        clearscreen::clear()?;
         match matched_profile {
             Some(matched_profile) => {
                 let tsh_args = ssh::connect::get_tsh_command(
@@ -70,6 +69,7 @@ impl Default {
                     println!("{}", tsh_args.join(" "));
                     return Ok(());
                 }
+                clearscreen::clear()?;
                 ssh::connect::connect(tsh_args)?
             }
             None => {
@@ -78,6 +78,7 @@ impl Default {
                     println!("{}", tsh_args.join(" "));
                     return Ok(());
                 }
+                clearscreen::clear()?;
                 ssh::connect::connect(tsh_args)?
             }
         };

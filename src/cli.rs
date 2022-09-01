@@ -34,6 +34,7 @@ pub struct Beam {
     pub cmd: Option<Command>,
 
     #[clap(
+        global = true,
         long = "tsh",
         help = "output the tsh command, that would be used to connect to the node"
     )]
