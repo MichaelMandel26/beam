@@ -4,10 +4,17 @@ use std::process::{Command, ExitStatus};
 
 use crate::utils::profile::Profile;
 
-pub fn connect(host: &str, username: &str, profile: &Profile) -> Result<ExitStatus> {
+pub fn connect(mut tsh_args: Vec<String>) -> Result<ExitStatus> {
+    tsh_args.remove(0);
+    let mut process = Command::new("tsh").args(tsh_args).spawn()?;
+
+    process.wait().map_err(|e| anyhow::anyhow!(e))
+}
+
+pub fn get_tsh_command(host: &str, username: &str, profile: &Profile) -> Result<Vec<String>> {
     let host_string = format!("{}@{}", username, host);
 
-    let mut args = vec!["ssh"];
+    let mut args: Vec<String> = vec!["tsh".into(), "ssh".into()];
     let port_forwarding_string;
 
     if profile.config.enable_port_forwarding.is_some()
@@ -34,14 +41,12 @@ pub fn connect(host: &str, username: &str, profile: &Profile) -> Result<ExitStat
         )
             .red(),
         )?;
-        args.push("-L");
+        args.push("-L".into());
         port_forwarding_string = format!("{}:{}:{}", listen_port, remote_host, remote_port);
-        args.push(port_forwarding_string.as_str());
+        args.push(port_forwarding_string);
     }
 
-    args.push(host_string.as_str());
+    args.push(host_string);
 
-    let mut process = Command::new("tsh").args(args).spawn()?;
-
-    process.wait().map_err(|e| anyhow::anyhow!(e))
+    Ok(args)
 }

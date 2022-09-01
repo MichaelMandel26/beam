@@ -61,7 +61,14 @@ impl Connect {
         };
 
         clearscreen::clear()?;
-        ssh::connect::connect(&self.host, username, &profile)?;
+
+        let tsh_args = ssh::connect::get_tsh_command(&self.host, username, &profile)?;
+        if beam.tsh {
+            println!("{}", tsh_args.join(" "));
+            return Ok(());
+        }
+
+        ssh::connect::connect(tsh_args)?;
 
         Ok(())
     }

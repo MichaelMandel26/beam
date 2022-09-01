@@ -60,12 +60,26 @@ impl Default {
 
         clearscreen::clear()?;
         match matched_profile {
-            Some(matched_profile) => ssh::connect::connect(
-                host,
-                matched_profile.config.username.as_ref().unwrap(),
-                &matched_profile,
-            )?,
-            None => ssh::connect::connect(host, user, &profile)?,
+            Some(matched_profile) => {
+                let tsh_args = ssh::connect::get_tsh_command(
+                    host,
+                    matched_profile.config.username.as_ref().unwrap(),
+                    &matched_profile,
+                )?;
+                if beam.tsh {
+                    println!("{}", tsh_args.join(" "));
+                    return Ok(());
+                }
+                ssh::connect::connect(tsh_args)?
+            }
+            None => {
+                let tsh_args = ssh::connect::get_tsh_command(host, user, &profile)?;
+                if beam.tsh {
+                    println!("{}", tsh_args.join(" "));
+                    return Ok(());
+                }
+                ssh::connect::connect(tsh_args)?
+            }
         };
 
         Ok(())
