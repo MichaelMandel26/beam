@@ -60,8 +60,14 @@ impl Connect {
             None => profile.config.username.as_ref().context("No username configured to login with. Please use --username or configure it using beam configure").unwrap_or(&fallback)
         };
 
+        let tsh_args = ssh::connect::get_tsh_command(&self.host, username, &profile)?;
+        if beam.tsh {
+            println!("{}", tsh_args.join(" "));
+            return Ok(());
+        }
+
         clearscreen::clear()?;
-        ssh::connect::connect(&self.host, username, &profile)?;
+        ssh::connect::connect(tsh_args)?;
 
         Ok(())
     }

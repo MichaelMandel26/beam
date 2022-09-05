@@ -32,6 +32,13 @@ pub struct Beam {
 
     #[clap(subcommand)]
     pub cmd: Option<Command>,
+
+    #[clap(
+        global = true,
+        long = "tsh",
+        help = "output the tsh command, that would be used to connect to the node"
+    )]
+    pub tsh: bool,
 }
 
 #[derive(Parser, Debug)]
