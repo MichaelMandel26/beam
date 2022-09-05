@@ -3,7 +3,6 @@
 [![Crates.io](https://img.shields.io/crates/v/beamcli)](https://crates.io/crates/beamcli)
 [![CI](https://github.com/MichaelMandel26/beam/actions/workflows/main.yml/badge.svg)](https://github.com/MichaelMandel26/beam/actions/workflows/main.yml)
 [![codecov](https://codecov.io/gh/MichaelMandel26/beam/branch/main/graph/badge.svg?token=QAYMC9JTCZ)](https://codecov.io/gh/MichaelMandel26/beam)
-[![dependency status](https://deps.rs/crate/beamcli/0.4.5/status.svg)](https://deps.rs/crate/beamcli/0.4.5)
 
 > Beam me up Ferris!
 
