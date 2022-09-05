@@ -50,3 +50,74 @@ pub fn get_tsh_command(host: &str, username: &str, profile: &Profile) -> Result<
 
     Ok(args)
 }
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn test_get_tsh_command_port_forwarding() {
+        use super::*;
+        use crate::utils::config::Config;
+        use crate::utils::profile::Profile;
+
+        let username = "testuser";
+
+        let profile = Profile {
+            name: "test".into(),
+            config: Config {
+                username: Some(username.into()),
+                enable_port_forwarding: Some(true),
+                listen_port: Some(8080),
+                remote_host: Some("localhost".into()),
+                remote_port: Some(80),
+                proxy: None,
+                auth: None,
+                cache_ttl: None,
+                label_whitelist: None,
+            },
+            default: true,
+            host_pattern: None,
+            priority: None,
+        };
+
+        let args = get_tsh_command("t-test", username, &profile).unwrap();
+
+        assert_eq!(args[0], "tsh");
+        assert_eq!(args[1], "ssh");
+        assert_eq!(args[2], "-L");
+        assert_eq!(args[3], "8080:localhost:80");
+        assert_eq!(args[4], "testuser@t-test");
+    }
+
+    #[test]
+    fn test_get_tsh_command() {
+        use super::*;
+        use crate::utils::config::Config;
+        use crate::utils::profile::Profile;
+
+        let username = "testuser";
+
+        let profile = Profile {
+            name: "test".into(),
+            config: Config {
+                username: Some(username.into()),
+                enable_port_forwarding: Some(false),
+                listen_port: None,
+                remote_host: None,
+                remote_port: None,
+                proxy: None,
+                auth: None,
+                cache_ttl: None,
+                label_whitelist: None,
+            },
+            default: true,
+            host_pattern: None,
+            priority: None,
+        };
+
+        let args = get_tsh_command("t-test", username, &profile).unwrap();
+
+        assert_eq!(args[0], "tsh");
+        assert_eq!(args[1], "ssh");
+        assert_eq!(args[2], "testuser@t-test");
+    }
+}
