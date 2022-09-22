@@ -154,10 +154,7 @@ impl Profiles {
             0 => Ok(None),
             1 => Ok(Some(matched_profiles[0].clone())),
             _ => {
-                matched_profiles = matched_profiles
-                    .into_iter()
-                    .filter(|profile| profile.priority.is_some())
-                    .collect();
+                matched_profiles.retain(|profile| profile.priority.is_some());
                 matched_profiles.sort_by(|a, b| a.priority.cmp(&b.priority));
 
                 Ok(if matched_profiles.is_empty() {
