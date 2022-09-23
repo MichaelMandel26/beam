@@ -2,8 +2,8 @@ use anyhow::{Context, Result};
 use clap::Parser;
 
 use crate::ssh;
-use crate::teleport::node::SkimString;
-use crate::teleport::{cli, node};
+use crate::teleport::cli;
+use crate::teleport::node::{Node, SkimString};
 use crate::utils::profile::Profile;
 use crate::utils::profiles::{Profiles, DEFAULT_PROFILE};
 use crate::utils::skim;
@@ -41,7 +41,7 @@ impl Default {
             }
         }
 
-        let nodes = node::get(!beam.clear_cache, proxy)?;
+        let nodes = Node::get(!beam.clear_cache, proxy)?;
 
         let label_whitelist = profile.config.label_whitelist.clone();
 
