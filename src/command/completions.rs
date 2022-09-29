@@ -2,7 +2,7 @@ use std::io;
 
 use crate::cli::Beam;
 use anyhow::{anyhow, Result};
-use clap::{IntoApp, Parser};
+use clap::{CommandFactory, Parser};
 use clap_complete::{generate, Shell};
 
 #[derive(Debug, Parser)]
