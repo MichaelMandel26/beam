@@ -4,7 +4,7 @@ use clap::Parser;
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    match Beam::from_args().run().await {
+    match Beam::parse().run().await {
         Ok(_) => Ok(()),
         Err(e) => {
             eprintln!("{}", e);
