@@ -1,4 +1,7 @@
-use crate::utils::version;
+use crate::{
+    config::Config,
+    utils::{config::Config, profile::Profile, profiles::DEFAULT_PROFILE, version},
+};
 use anyhow::Result;
 use clap::Parser;
 use colored::Colorize;
@@ -10,7 +13,7 @@ const LATEST_RELEASE_URL: &str = "https://github.com/MichaelMandel26/beam/releas
 
 #[derive(Parser, Debug)]
 #[clap(name = "beam", about = "Easier connection to teleport hosts", version)]
-pub struct Beam {
+pub struct App {
     #[clap(short, long, help = "The profile to use")]
     pub profile: Option<String>,
 
@@ -53,30 +56,33 @@ pub enum Command {
     Logout(command::logout::Logout),
 }
 
-impl Beam {
+impl App {
     pub async fn run(&self) -> Result<()> {
-        Beam::check_for_dot_beam_dir()?;
+        App::check_for_dot_beam_dir()?;
         // Asynchronously getting the latest version from GitHub
         let latest_version =
             tokio::spawn(async move { version::get_latest_release(LATEST_RELEASE_URL).await });
 
-        self.execute_command()?;
+
+        let config = &self.config()?;
+
+        self.execute_command(config)?;
 
         // Printing notification if the latest version is newer than the current version
-        Beam::check_for_update(latest_version.await?)?;
+        App::check_for_update(latest_version.await?)?;
         Ok(())
     }
 
-    pub fn execute_command(&self) -> Result<()> {
+    pub fn execute_command(&self, config: Config) -> Result<()> {
         match &self.cmd {
-            Some(Command::Connect(command)) => command.run(self),
+            Some(Command::Connect(command)) => command.run(config),
             Some(Command::Profile(command)) => command.run(),
-            Some(Command::List(command)) => command.run(self),
-            Some(Command::Login(command)) => command.run(self),
+            Some(Command::List(command)) => command.run(config),
+            Some(Command::Login(command)) => command.run(config),
             Some(Command::Logout(command)) => command.run(),
             Some(Command::Completions(command)) => command.run(),
             Some(Command::Configure(command)) => command.run(),
-            None => command::default::Default::run(self),
+            None => command::default::Default::run(config),
         }
     }
 
@@ -105,6 +111,28 @@ impl Beam {
 
         Ok(())
     }
+
+    fn config(&self) -> Result<Config> {
+        let profile = match &self.profile.is_some() {
+            true => Profile::get(self.profile.as_ref().unwrap().as_str())?,
+            false => DEFAULT_PROFILE.clone(),
+        };
+
+        let username = &self.user.unwrap_or(profile.config.username);
+        let proxy = &self.proxy.unwrap_or(profile.config.proxy);
+        let auth = &self.auth.unwrap_or(profile.config.auth);
+        let cache_ttl = profile.config.cache_ttl;
+
+        let config = Config::new()
+            .username(username)
+            .proxy(proxy)
+            .auth(auth)
+            .cache_ttl(cache_ttl)
+            .clear_cache(self.clear_cache)
+            .build();
+
+        Ok(config)
+    }
 }
 
 #[cfg(test)]
@@ -112,6 +140,6 @@ mod tests {
     use super::*;
     #[test]
     fn test_check_for_dot_beam_dir() {
-        assert!(Beam::check_for_dot_beam_dir().is_ok());
+        assert!(App::check_for_dot_beam_dir().is_ok());
     }
 }

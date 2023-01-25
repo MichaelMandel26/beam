@@ -4,7 +4,7 @@ use dialoguer::{theme::ColorfulTheme, Confirm, Input, MultiSelect, Select};
 use serde::{Deserialize, Serialize};
 use std::process;
 
-use crate::utils::{config::Config, profiles::Profiles};
+use crate::{utils::profiles::Profiles, config::Config};
 
 #[derive(Debug, Deserialize, Serialize, Clone, Default, PartialEq, Eq)]
 pub struct Profile {
