@@ -1,6 +1,6 @@
 use crate::{
-    config::Config,
-    utils::{config::Config, profile::Profile, profiles::DEFAULT_PROFILE, version},
+    config::{Config, RuntimeConfig},
+    utils::{profile::Profile, profiles::DEFAULT_PROFILE, version},
 };
 use anyhow::Result;
 use clap::Parser;
@@ -63,8 +63,7 @@ impl App {
         let latest_version =
             tokio::spawn(async move { version::get_latest_release(LATEST_RELEASE_URL).await });
 
-
-        let config = &self.config()?;
+        let config = self.config()?;
 
         self.execute_command(config)?;
 
@@ -73,9 +72,9 @@ impl App {
         Ok(())
     }
 
-    pub fn execute_command(&self, config: Config) -> Result<()> {
+    pub fn execute_command(&self, config: RuntimeConfig) -> Result<()> {
         match &self.cmd {
-            Some(Command::Connect(command)) => command.run(config),
+            Some(Command::Connect(command)) => command.run(&config),
             Some(Command::Profile(command)) => command.run(),
             Some(Command::List(command)) => command.run(config),
             Some(Command::Login(command)) => command.run(config),
@@ -112,7 +111,7 @@ impl App {
         Ok(())
     }
 
-    fn config(&self) -> Result<Config> {
+    fn config(&self) -> Result<RuntimeConfig> {
         let profile = match &self.profile.is_some() {
             true => Profile::get(self.profile.as_ref().unwrap().as_str())?,
             false => DEFAULT_PROFILE.clone(),
@@ -128,10 +127,15 @@ impl App {
             .proxy(proxy)
             .auth(auth)
             .cache_ttl(cache_ttl)
+            .build();
+
+        let runtime_config = RuntimeConfig::new()
+            .config(config)
+            .tsh(self.tsh)
             .clear_cache(self.clear_cache)
             .build();
 
-        Ok(config)
+        Ok(runtime_config)
     }
 }
 

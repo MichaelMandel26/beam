@@ -1,19 +1,16 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize, Default, Clone, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, Default, PartialEq)]
 pub struct Config {
     pub username: String,
     pub proxy: String,
     pub auth: String,
     pub cache_ttl: u64,
-    // This value is only used for runtime conditions. Should not be persisted in any config file
-    #[serde(skip_serializing)]
-    pub clear_cache: bool,
     pub label_whitelist: Option<Vec<String>>,
     pub port_forwarding_config: PortForwardingConfig,
 }
 
-#[derive(Debug, Serialize, Deserialize, Default, Clone, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, Default, PartialEq)]
 struct PortForwardingConfig {
     pub enabled: bool,
     pub listen_port: Option<u16>,
@@ -21,13 +18,12 @@ struct PortForwardingConfig {
     pub remote_host: Option<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Default, Clone, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, Default, PartialEq)]
 pub struct ConfigBuilder {
     pub username: Option<String>,
     pub proxy: String,
     pub auth: String,
     pub cache_ttl: Option<u64>,
-    pub clear_cache: bool,
     pub label_whitelist: Option<Vec<String>>,
     pub enable_port_forwarding: Option<bool>,
     pub listen_port: Option<u16>,
@@ -65,18 +61,12 @@ impl ConfigBuilder {
         self
     }
 
-    pub fn clear_cache(mut self, clear_cache: bool) -> ConfigBuilder {
-        self.clear_cache = clear_cache;
-        self
-    }
-
     pub fn build(&self) -> Config {
         Config {
             username: self.username.unwrap_or(whoami::username()),
             proxy: self.proxy,
             auth: self.auth,
             cache_ttl: self.cache_ttl.unwrap_or(60 * 60 * 24),
-            clear_cache: self.clear_cache,
             label_whitelist: self.label_whitelist,
             port_forwarding_config: PortForwardingConfig::default(),
         }
@@ -86,5 +76,54 @@ impl ConfigBuilder {
 impl Config {
     pub fn new() -> ConfigBuilder {
         ConfigBuilder::default()
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize, Default, PartialEq)]
+pub struct RuntimeConfig {
+    pub clear_cache: bool,
+    pub tsh: bool,
+    pub config: Config,
+}
+
+impl RuntimeConfig {
+    pub fn new() -> RuntimeConfigBuilder {
+        RuntimeConfigBuilder::new()
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize, Default, PartialEq)]
+pub struct RuntimeConfigBuilder {
+    pub clear_cache: bool,
+    pub tsh: bool,
+    pub config: Config,
+}
+
+impl RuntimeConfigBuilder {
+    pub fn new() -> RuntimeConfigBuilder {
+        RuntimeConfigBuilder::default()
+    }
+
+    pub fn clear_cache(mut self, clear_cache: bool) -> RuntimeConfigBuilder {
+        self.clear_cache = clear_cache;
+        self
+    }
+
+    pub fn tsh(mut self, tsh: bool) -> RuntimeConfigBuilder {
+        self.tsh = tsh;
+        self
+    }
+
+    pub fn config(mut self, config: Config) -> RuntimeConfigBuilder {
+        self.config = config;
+        self
+    }
+
+    pub fn build(&self) -> RuntimeConfig {
+        RuntimeConfig {
+            clear_cache: self.clear_cache,
+            tsh: self.tsh,
+            config: self.config,
+        }
     }
 }

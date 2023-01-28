@@ -1,10 +1,8 @@
-use anyhow::{ensure, Context, Result};
+use anyhow::{ensure, Result};
 use clap::Parser;
 
-use crate::{ssh, config::Config};
+use crate::{ssh, config::{Config, RuntimeConfig}};
 use crate::teleport::{cli, node};
-use crate::utils::profile::Profile;
-use crate::utils::profiles::{Profiles, DEFAULT_PROFILE};
 
 #[derive(Debug, Parser)]
 pub struct Connect {
@@ -13,9 +11,9 @@ pub struct Connect {
 }
 
 impl Connect {
-    pub fn run(&self, config: &Config) -> Result<()> {
-        if !cli::is_logged_in()? || !cli::cmp_logged_in_proxy_with(proxy)? {
-            let exit_status = cli::login(proxy, auth, user)?;
+    pub fn run(&self, config: &RuntimeConfig) -> Result<()> {
+        if !cli::is_logged_in()? || !cli::cmp_logged_in_proxy_with(&config.config.proxy)? {
+            let exit_status = cli::login(&config.config.proxy, &config.config.auth, &config.config.username)?;
             if !exit_status.success() {
                 return Err(anyhow::anyhow!("Login failed"));
             }
