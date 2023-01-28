@@ -18,7 +18,7 @@ impl Remove {
         let mut profiles = match Profiles::get() {
             Ok(profiles) => profiles,
             Err(err) => {
-                println!("{}", err);
+                println!("{err}");
                 process::exit(1);
             }
         };
@@ -65,7 +65,7 @@ impl Remove {
             println!("You are trying to remove the default profile. Please select a new default profile first.");
             // Get profile names
             let mut profile_names = Profiles::get_names(&profiles)?;
-            profile_names.retain(|p| p != &format!("{} (default)", profile_name));
+            profile_names.retain(|p| p != &format!("{profile_name} (default)"));
 
             let new_default_name_selection = Select::with_theme(&ColorfulTheme::default())
                 .with_prompt("Select new default profile")
@@ -92,7 +92,7 @@ impl Remove {
                 Ok(())
             }
             Err(err) => {
-                println!("{}", err);
+                println!("{err}");
                 process::exit(1);
             }
         }

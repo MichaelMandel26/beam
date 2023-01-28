@@ -1,8 +1,11 @@
 use anyhow::{ensure, Result};
 use clap::Parser;
 
-use crate::{ssh, config::{Config, RuntimeConfig}};
-use crate::teleport::{cli, node};
+use crate::ssh;
+use crate::{
+    context::RuntimeContext,
+    teleport::{cli, node},
+};
 
 #[derive(Debug, Parser)]
 pub struct Connect {
@@ -11,28 +14,31 @@ pub struct Connect {
 }
 
 impl Connect {
-    pub fn run(&self, config: &RuntimeConfig) -> Result<()> {
-        if !cli::is_logged_in()? || !cli::cmp_logged_in_proxy_with(&config.config.proxy)? {
-            let exit_status = cli::login(&config.config.proxy, &config.config.auth, &config.config.username)?;
+    pub fn run(&self, context: RuntimeContext) -> Result<()> {
+        if !cli::is_logged_in()? || !cli::cmp_logged_in_proxy_with(&context.config.proxy)? {
+            let exit_status = cli::login(
+                &context.config.proxy,
+                context.config.auth,
+                &context.config.username,
+            )?;
             if !exit_status.success() {
                 return Err(anyhow::anyhow!("Login failed"));
             }
         }
 
-        let nodes = node::get(!beam.clear_cache, proxy)?;
+        let nodes = node::get(!&context.flags.clear_cache, &context.config.proxy)?;
         ensure!(
             nodes.iter().any(|node| node.spec.hostname == self.host),
             "Host not found in teleport"
         );
 
-        let fallback = whoami::username();
-        let username = match &beam.user {
-            Some(username) => username,
-            None => profile.config.username.as_ref().context("No username configured to login with. Please use --username or configure it using beam configure").unwrap_or(&fallback)
-        };
-
-        let tsh_args = ssh::connect::get_tsh_command(&self.host, username, &profile)?;
-        if beam.tsh {
+        let tsh_args = ssh::connect::get_tsh_command(
+            &self.host,
+            &context.config.username,
+            &context.meta.profile_name,
+            &context.config.port_forwarding_config,
+        )?;
+        if context.flags.tsh {
             println!("{}", tsh_args.join(" "));
             return Ok(());
         }

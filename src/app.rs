@@ -1,5 +1,6 @@
 use crate::{
-    config::{Config, RuntimeConfig},
+    config::Config,
+    context::RuntimeContext,
     utils::{profile::Profile, profiles::DEFAULT_PROFILE, version},
 };
 use anyhow::Result;
@@ -57,31 +58,31 @@ pub enum Command {
 }
 
 impl App {
-    pub async fn run(&self) -> Result<()> {
+    pub async fn run(self) -> Result<()> {
         App::check_for_dot_beam_dir()?;
         // Asynchronously getting the latest version from GitHub
         let latest_version =
             tokio::spawn(async move { version::get_latest_release(LATEST_RELEASE_URL).await });
 
-        let config = self.config()?;
+        let context = self.context()?;
 
-        self.execute_command(config)?;
+        self.execute_command(context)?;
 
         // Printing notification if the latest version is newer than the current version
         App::check_for_update(latest_version.await?)?;
         Ok(())
     }
 
-    pub fn execute_command(&self, config: RuntimeConfig) -> Result<()> {
+    pub fn execute_command(&self, context: RuntimeContext) -> Result<()> {
         match &self.cmd {
-            Some(Command::Connect(command)) => command.run(&config),
+            Some(Command::Connect(command)) => command.run(context),
             Some(Command::Profile(command)) => command.run(),
-            Some(Command::List(command)) => command.run(config),
-            Some(Command::Login(command)) => command.run(config),
+            Some(Command::List(command)) => command.run(context),
+            Some(Command::Login(command)) => command.run(context),
             Some(Command::Logout(command)) => command.run(),
             Some(Command::Completions(command)) => command.run(),
             Some(Command::Configure(command)) => command.run(),
-            None => command::default::Default::run(config),
+            None => command::default::Default::run(context),
         }
     }
 
@@ -111,31 +112,45 @@ impl App {
         Ok(())
     }
 
-    fn config(&self) -> Result<RuntimeConfig> {
+    fn context(&self) -> Result<RuntimeContext> {
         let profile = match &self.profile.is_some() {
             true => Profile::get(self.profile.as_ref().unwrap().as_str())?,
             false => DEFAULT_PROFILE.clone(),
         };
 
-        let username = &self.user.unwrap_or(profile.config.username);
-        let proxy = &self.proxy.unwrap_or(profile.config.proxy);
-        let auth = &self.auth.unwrap_or(profile.config.auth);
+        let username = self.user.as_ref().unwrap_or(&profile.config.username);
+        let proxy = self.proxy.as_ref().unwrap_or(&profile.config.proxy);
         let cache_ttl = profile.config.cache_ttl;
 
-        let config = Config::new()
+        let mut config_builder = Config::builder();
+
+        config_builder
             .username(username)
             .proxy(proxy)
-            .auth(auth)
-            .cache_ttl(cache_ttl)
-            .build();
+            .cache_ttl(cache_ttl);
 
-        let runtime_config = RuntimeConfig::new()
+        let auth = match self.auth {
+            Some(_) => self.auth.clone(),
+            None => profile.config.auth,
+        };
+
+        if let Some(auth) = auth {
+            config_builder.auth(auth);
+        }
+
+        let config = config_builder.build();
+
+        let mut runtime_context_builder = RuntimeContext::builder();
+
+        runtime_context_builder
             .config(config)
             .tsh(self.tsh)
             .clear_cache(self.clear_cache)
-            .build();
+            .profile_name(profile.name);
 
-        Ok(runtime_config)
+        let runtime_context = runtime_context_builder.build();
+
+        Ok(runtime_context)
     }
 }
 

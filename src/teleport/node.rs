@@ -70,11 +70,11 @@ impl SkimString for Vec<Node> {
 pub fn get(use_cache: bool, proxy: &str) -> Result<Vec<Node>> {
     let cache_file = home::home_dir()
         .unwrap()
-        .join(format!(".beam/cache/{}.json", proxy));
+        .join(format!(".beam/cache/{proxy}.json"));
 
     let is_cache_file_old = if cache_file.exists() {
         let metadata = cache_file.metadata()?;
-        let ttl = DEFAULT_PROFILE.config.cache_ttl.unwrap_or(60 * 60 * 24);
+        let ttl = DEFAULT_PROFILE.config.cache_ttl;
         metadata.modified()?.elapsed()? > Duration::from_secs(ttl)
     } else {
         true
@@ -105,7 +105,7 @@ fn get_from_tsh(proxy: &str) -> Result<Vec<Node>> {
 fn get_from_cache(proxy: &str) -> Result<Vec<Node>> {
     let cache_path = home::home_dir()
         .unwrap()
-        .join(format!(".beam/cache/{}.json", proxy));
+        .join(format!(".beam/cache/{proxy}.json"));
     let cache_json = std::fs::read_to_string(cache_path)?;
     let cached_nodes: Vec<Node> = serde_json::from_str(&cache_json)?;
     Ok(cached_nodes)
@@ -114,7 +114,7 @@ fn get_from_cache(proxy: &str) -> Result<Vec<Node>> {
 pub fn write_to_cache(nodes_json: String, proxy: &str) -> Result<()> {
     let cache_dir = home::home_dir().unwrap().join(".beam/cache");
     std::fs::create_dir_all(&cache_dir)?;
-    let cache_file = cache_dir.join(format!("{}.json", proxy));
+    let cache_file = cache_dir.join(format!("{proxy}.json"));
     std::fs::write(cache_file, nodes_json)?;
     Ok(())
 }

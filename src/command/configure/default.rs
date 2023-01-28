@@ -15,7 +15,7 @@ impl Default {
         let profiles = match Profiles::get() {
             Ok(profiles) => profiles,
             Err(err) => {
-                println!("{}", err);
+                println!("{err}");
                 process::exit(1);
             }
         };

@@ -4,7 +4,7 @@ use dialoguer::{theme::ColorfulTheme, Confirm, Input, MultiSelect, Select};
 use serde::{Deserialize, Serialize};
 use std::process;
 
-use crate::{utils::profiles::Profiles, config::Config};
+use crate::{config::Config, utils::profiles::Profiles};
 
 #[derive(Debug, Deserialize, Serialize, Clone, Default, PartialEq, Eq)]
 pub struct Profile {
@@ -37,7 +37,7 @@ impl Profile {
         let profiles = match Profiles::get() {
             Ok(profiles) => profiles,
             Err(err) => {
-                println!("{}", err);
+                println!("{err}");
                 process::exit(1);
             }
         };
@@ -73,32 +73,14 @@ impl Profile {
     pub fn wizard(profile: &mut Profile) -> Result<()> {
         profile.host_pattern = Profile::host_pattern_wizard(&profile.host_pattern)?;
 
-        // Proxy
-        let default_proxy = match &profile.config.proxy {
-            Some(proxy) => proxy.to_owned(),
-            None => "".to_string(),
-        };
-
-        let proxy: String = if default_proxy.is_empty() {
-            Input::with_theme(&ColorfulTheme::default())
-                .with_prompt("Proxy")
-                .interact_text()?
-        } else {
-            Input::with_theme(&ColorfulTheme::default())
-                .with_prompt("Proxy")
-                .default(default_proxy)
-                .interact_text()?
-        };
-
-        // Username
-        let default_username = match &profile.config.username {
-            Some(username) => username.to_owned(),
-            None => whoami::username(),
-        };
+        let proxy: String = Input::with_theme(&ColorfulTheme::default())
+            .with_prompt("Proxy")
+            .default(profile.config.proxy.clone())
+            .interact_text()?;
 
         let username = Input::with_theme(&ColorfulTheme::default())
             .with_prompt("Username")
-            .default(default_username)
+            .default(profile.config.username.clone())
             .interact_text()?;
 
         // Auth
@@ -112,15 +94,9 @@ impl Profile {
             .default(default_auth)
             .interact_text()?;
 
-        // cache_ttl
-        let default_ttl = match &profile.config.cache_ttl {
-            Some(cache_ttl) => cache_ttl.to_string(),
-            None => ((60 * 60 * 24) as u64).to_string(),
-        };
-
         let cache_ttl = Input::with_theme(&ColorfulTheme::default())
             .with_prompt("Cache TTL")
-            .default(default_ttl)
+            .default(profile.config.cache_ttl)
             .interact_text()?;
 
         // Label Whitelist
@@ -179,10 +155,10 @@ impl Profile {
             }
         }
 
-        profile.config.proxy = Some(proxy);
-        profile.config.username = Some(username);
+        profile.config.proxy = proxy;
+        profile.config.username = username;
         profile.config.auth = if auth != "default" { Some(auth) } else { None };
-        profile.config.cache_ttl = Some(cache_ttl.parse::<u64>()?);
+        profile.config.cache_ttl = cache_ttl;
 
         Ok(())
     }
@@ -216,7 +192,7 @@ impl Profile {
 
     pub fn host_pattern_wizard(default: &Option<String>) -> Result<Option<String>> {
         let confirmation_message = match default {
-            Some(default) => format!("Do you want to auto-select this profile, using a regex pattern on the hostname?\n Currently: {}", default),
+            Some(default) => format!("Do you want to auto-select this profile, using a regex pattern on the hostname?\n Currently: {default}"),
             None => "Do you want to auto-select this profile, using a regex pattern on the hostname?".to_string(),
         };
 

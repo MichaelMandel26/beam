@@ -1,6 +1,6 @@
 use std::io;
 
-use crate::cli::App;
+use crate::app::App;
 use anyhow::{anyhow, Result};
 use clap::{CommandFactory, Parser};
 use clap_complete::{generate, Shell};

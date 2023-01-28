@@ -16,11 +16,11 @@ pub fn is_logged_in() -> Result<bool> {
     Ok(is_logged_in)
 }
 
-pub fn login(proxy: &str, auth: Option<&String>, user: &str) -> Result<ExitStatus> {
-    let proxy_args = format!("--proxy={}", proxy);
+pub fn login(proxy: &str, auth: Option<String>, user: &str) -> Result<ExitStatus> {
+    let proxy_args = format!("--proxy={proxy}");
     let mut args = vec!["login", proxy_args.as_str()];
 
-    let user_args = format!("--user={}", user);
+    let user_args = format!("--user={user}");
     args.push(user_args.as_str());
 
     let auth_args;
@@ -34,7 +34,7 @@ pub fn login(proxy: &str, auth: Option<&String>, user: &str) -> Result<ExitStatu
 }
 
 pub fn logout() -> Result<ExitStatus> {
-    let mut process = Command::new("tsh").args(&["logout"]).spawn()?;
+    let mut process = Command::new("tsh").args(["logout"]).spawn()?;
     process.wait().map_err(|e| anyhow::anyhow!(e))
 }
 

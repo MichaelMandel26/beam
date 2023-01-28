@@ -5,7 +5,10 @@ use clap::Parser;
 use colored::Colorize;
 use dialoguer::{theme::ColorfulTheme, Confirm};
 
-use crate::utils::{config::Config, profile::Profile, profiles::Profiles};
+use crate::{
+    config::Config,
+    utils::{profile::Profile, profiles::Profiles},
+};
 
 #[derive(Parser, Debug)]
 pub struct Add {
@@ -18,7 +21,7 @@ impl Add {
         let profiles = match Profiles::get() {
             Ok(profiles) => profiles,
             Err(err) => {
-                println!("{}", err);
+                println!("{err}");
                 process::exit(1);
             }
         };

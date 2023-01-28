@@ -2,7 +2,7 @@ use anyhow::{Context, Result};
 use colored::Colorize;
 use std::process::{Command, ExitStatus};
 
-use crate::utils::profile::Profile;
+use crate::config::PortForwardingConfig;
 
 pub fn connect(mut tsh_args: Vec<String>) -> Result<ExitStatus> {
     tsh_args.remove(0);
@@ -11,38 +11,41 @@ pub fn connect(mut tsh_args: Vec<String>) -> Result<ExitStatus> {
     process.wait().map_err(|e| anyhow::anyhow!(e))
 }
 
-pub fn get_tsh_command(host: &str, username: &str, profile: &Profile) -> Result<Vec<String>> {
-    let host_string = format!("{}@{}", username, host);
+pub fn get_tsh_command(
+    host: &str,
+    username: &str,
+    profile_name: &str,
+    port_forwarding_config: &PortForwardingConfig,
+) -> Result<Vec<String>> {
+    let host_string = format!("{username}@{host}");
 
     let mut args: Vec<String> = vec!["tsh".into(), "ssh".into()];
     let port_forwarding_string;
 
-    if profile.config.enable_port_forwarding.is_some()
-        && profile.config.enable_port_forwarding.unwrap()
-    {
-        let listen_port = profile.config.listen_port.context(
+    if port_forwarding_config.enabled {
+        let listen_port = port_forwarding_config.listen_port.context(
             format!(
             "port forwarding was activated for profile {}, but listen_port property was not set",
-            profile.name.cyan()
+profile_name.cyan()
         )
             .red(),
         )?;
-        let remote_host = profile.config.remote_host.as_ref().context(
+        let remote_host = port_forwarding_config.remote_host.as_ref().context(
             format!(
             "port forwarding was activated for profile {}, but remote_host property was not set",
-            profile.name.cyan()
+profile_name.cyan()
         )
             .red(),
         )?;
-        let remote_port = profile.config.remote_port.context(
+        let remote_port = port_forwarding_config.remote_port.context(
             format!(
             "port forwarding was activated for profile {}, but remote_port property was not set",
-            profile.name.cyan()
+profile_name.cyan()
         )
             .red(),
         )?;
         args.push("-L".into());
-        port_forwarding_string = format!("{}:{}:{}", listen_port, remote_host, remote_port);
+        port_forwarding_string = format!("{listen_port}:{remote_host}:{remote_port}");
         args.push(port_forwarding_string);
     }
 
@@ -53,33 +56,24 @@ pub fn get_tsh_command(host: &str, username: &str, profile: &Profile) -> Result<
 
 #[cfg(test)]
 mod tests {
+
     #[test]
     fn test_get_tsh_command_port_forwarding() {
         use super::*;
-        use crate::utils::config::Config;
-        use crate::utils::profile::Profile;
+        use crate::config::PortForwardingConfig;
 
         let username = "testuser";
+        let profile_name = "test";
 
-        let profile = Profile {
-            name: "test".into(),
-            config: Config {
-                username: Some(username.into()),
-                enable_port_forwarding: Some(true),
-                listen_port: Some(8080),
-                remote_host: Some("localhost".into()),
-                remote_port: Some(80),
-                proxy: None,
-                auth: None,
-                cache_ttl: None,
-                label_whitelist: None,
-            },
-            default: true,
-            host_pattern: None,
-            priority: None,
+        let port_forwarding_config = PortForwardingConfig {
+            enabled: true,
+            listen_port: Some(8080),
+            remote_host: Some("localhost".into()),
+            remote_port: Some(80),
         };
 
-        let args = get_tsh_command("t-test", username, &profile).unwrap();
+        let args =
+            get_tsh_command("t-test", username, profile_name, &port_forwarding_config).unwrap();
 
         assert_eq!(args[0], "tsh");
         assert_eq!(args[1], "ssh");
@@ -91,30 +85,20 @@ mod tests {
     #[test]
     fn test_get_tsh_command() {
         use super::*;
-        use crate::utils::config::Config;
-        use crate::utils::profile::Profile;
+        use crate::config::PortForwardingConfig;
 
         let username = "testuser";
+        let profile_name = "test";
 
-        let profile = Profile {
-            name: "test".into(),
-            config: Config {
-                username: Some(username.into()),
-                enable_port_forwarding: Some(false),
-                listen_port: None,
-                remote_host: None,
-                remote_port: None,
-                proxy: None,
-                auth: None,
-                cache_ttl: None,
-                label_whitelist: None,
-            },
-            default: true,
-            host_pattern: None,
-            priority: None,
+        let port_forwarding_config = PortForwardingConfig {
+            enabled: false,
+            listen_port: None,
+            remote_host: None,
+            remote_port: None,
         };
 
-        let args = get_tsh_command("t-test", username, &profile).unwrap();
+        let args =
+            get_tsh_command("t-test", username, profile_name, &port_forwarding_config).unwrap();
 
         assert_eq!(args[0], "tsh");
         assert_eq!(args[1], "ssh");
