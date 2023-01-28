@@ -36,27 +36,27 @@ impl ConfigBuilder {
         ConfigBuilder::default()
     }
 
-    pub fn username(&mut self, username: impl ToString) -> &mut Self {
+    pub fn username(mut self, username: impl ToString) -> Self {
         self.username = Some(username.to_string());
         self
     }
 
-    pub fn proxy(&mut self, proxy: impl ToString) -> &mut Self {
+    pub fn proxy(mut self, proxy: impl ToString) -> Self {
         self.proxy = proxy.to_string();
         self
     }
 
-    pub fn auth(&mut self, auth: impl ToString) -> &mut Self {
+    pub fn auth(mut self, auth: impl ToString) -> Self {
         self.auth = Some(auth.to_string());
         self
     }
 
-    pub fn cache_ttl(&mut self, cache_ttl: u64) -> &mut Self {
+    pub fn cache_ttl(mut self, cache_ttl: u64) -> Self {
         self.cache_ttl = Some(cache_ttl);
         self
     }
 
-    pub fn label_whitelist(&mut self, label_whitelist: Vec<String>) -> &mut Self {
+    pub fn label_whitelist(mut self, label_whitelist: Vec<String>) -> Self {
         self.label_whitelist = Some(label_whitelist);
         self
     }

@@ -40,22 +40,22 @@ impl RuntimeContextBuilder {
         RuntimeContextBuilder::default()
     }
 
-    pub fn clear_cache(&mut self, clear_cache: bool) -> &mut Self {
+    pub fn clear_cache(mut self, clear_cache: bool) -> Self {
         self.flags.clear_cache = clear_cache;
         self
     }
 
-    pub fn tsh(&mut self, tsh: bool) -> &mut Self {
+    pub fn tsh(mut self, tsh: bool) -> Self {
         self.flags.tsh = tsh;
         self
     }
 
-    pub fn config(&mut self, config: Config) -> &mut Self {
+    pub fn config(mut self, config: Config) -> Self {
         self.config = config;
         self
     }
 
-    pub fn profile_name(&mut self, profile_name: impl ToString) -> &mut Self {
+    pub fn profile_name(mut self, profile_name: impl ToString) -> Self {
         self.meta.profile_name = profile_name.to_string();
         self
     }

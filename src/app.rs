@@ -122,9 +122,7 @@ impl App {
         let proxy = self.proxy.as_ref().unwrap_or(&profile.config.proxy);
         let cache_ttl = profile.config.cache_ttl;
 
-        let mut config_builder = Config::builder();
-
-        config_builder
+        let mut config_builder = Config::builder()
             .username(username)
             .proxy(proxy)
             .cache_ttl(cache_ttl);
@@ -135,20 +133,17 @@ impl App {
         };
 
         if let Some(auth) = auth {
-            config_builder.auth(auth);
+            config_builder = config_builder.auth(auth);
         }
 
         let config = config_builder.build();
 
-        let mut runtime_context_builder = RuntimeContext::builder();
-
-        runtime_context_builder
+        let runtime_context = RuntimeContext::builder()
             .config(config)
             .tsh(self.tsh)
             .clear_cache(self.clear_cache)
-            .profile_name(profile.name);
-
-        let runtime_context = runtime_context_builder.build();
+            .profile_name(profile.name)
+            .build();
 
         Ok(runtime_context)
     }
