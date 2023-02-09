@@ -2,7 +2,7 @@ use anyhow::{anyhow, Context, Result};
 use lazy_static::lazy_static;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
-use std::{collections::BTreeMap as Map, fs};
+use std::{collections::BTreeMap as Map, fs, process};
 
 use crate::utils::profile::Profile;
 
@@ -14,7 +14,7 @@ lazy_static! {
         Ok(profile) => profile,
         Err(err) => {
             println!("{err}");
-            Profiles::get_default().unwrap()
+            process::exit(0)
         }
     };
 }
