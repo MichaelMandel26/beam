@@ -46,7 +46,10 @@ impl Default {
                     host,
                     &matched_profile.config.username,
                     &matched_profile.name,
-                    &matched_profile.config.port_forwarding_config,
+                    &matched_profile
+                        .config
+                        .port_forwarding_config
+                        .unwrap_or_default(),
                 )?;
                 if context.flags.tsh {
                     println!("{}", tsh_args.join(" "));
@@ -60,7 +63,7 @@ impl Default {
                     host,
                     &context.config.username,
                     &context.meta.profile_name,
-                    &context.config.port_forwarding_config,
+                    &context.config.port_forwarding_config.unwrap_or_default(),
                 )?;
                 if context.flags.tsh {
                     println!("{}", tsh_args.join(" "));

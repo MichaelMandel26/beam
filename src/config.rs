@@ -7,7 +7,7 @@ pub struct Config {
     pub auth: Option<String>,
     pub cache_ttl: u64,
     pub label_whitelist: Option<Vec<String>>,
-    pub port_forwarding_config: PortForwardingConfig,
+    pub port_forwarding_config: Option<PortForwardingConfig>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default, Clone, PartialEq, Eq)]
@@ -25,10 +25,7 @@ pub struct ConfigBuilder {
     pub auth: Option<String>,
     pub cache_ttl: Option<u64>,
     pub label_whitelist: Option<Vec<String>>,
-    pub enable_port_forwarding: Option<bool>,
-    pub listen_port: Option<u16>,
-    pub remote_port: Option<u16>,
-    pub remote_host: Option<String>,
+    pub port_forwarding_config: Option<PortForwardingConfig>,
 }
 
 impl ConfigBuilder {
@@ -61,6 +58,11 @@ impl ConfigBuilder {
         self
     }
 
+    pub fn port_forwarding_config(mut self, port_forwarding_config: PortForwardingConfig) -> Self {
+        self.port_forwarding_config = Some(port_forwarding_config);
+        self
+    }
+
     pub fn build(self) -> Config {
         Config {
             username: self.username.unwrap_or(whoami::username()),
@@ -68,7 +70,7 @@ impl ConfigBuilder {
             auth: self.auth,
             cache_ttl: self.cache_ttl.unwrap_or(60 * 60 * 24),
             label_whitelist: self.label_whitelist,
-            port_forwarding_config: PortForwardingConfig::default(),
+            port_forwarding_config: self.port_forwarding_config,
         }
     }
 }

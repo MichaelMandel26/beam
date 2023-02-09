@@ -117,11 +117,13 @@ impl App {
         let username = self.user.as_ref().unwrap_or(&profile.config.username);
         let proxy = self.proxy.as_ref().unwrap_or(&profile.config.proxy);
         let cache_ttl = profile.config.cache_ttl;
+        let port_forwarding_config = profile.config.port_forwarding_config;
 
         let mut config_builder = Config::builder()
             .username(username)
             .proxy(proxy)
-            .cache_ttl(cache_ttl);
+            .cache_ttl(cache_ttl)
+            .port_forwarding_config(port_forwarding_config.unwrap_or_default());
 
         let auth = match self.auth {
             Some(_) => self.auth.clone(),

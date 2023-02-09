@@ -36,7 +36,7 @@ impl Connect {
             &self.host,
             &context.config.username,
             &context.meta.profile_name,
-            &context.config.port_forwarding_config,
+            &context.config.port_forwarding_config.unwrap_or_default(),
         )?;
         if context.flags.tsh {
             println!("{}", tsh_args.join(" "));
