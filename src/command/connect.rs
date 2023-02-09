@@ -2,7 +2,8 @@ use anyhow::{ensure, Context, Result};
 use clap::Parser;
 
 use crate::ssh;
-use crate::teleport::{cli, node};
+use crate::teleport::cli;
+use crate::teleport::node::Node;
 use crate::utils::profile::Profile;
 use crate::utils::profiles::{Profiles, DEFAULT_PROFILE};
 
@@ -48,7 +49,7 @@ impl Connect {
             }
         }
 
-        let nodes = node::get(!beam.clear_cache, proxy)?;
+        let nodes = Node::get(!beam.clear_cache, proxy)?;
         ensure!(
             nodes.iter().any(|node| node.spec.hostname == self.host),
             "Host not found in teleport"
