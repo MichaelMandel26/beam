@@ -2,7 +2,7 @@ use anyhow::{anyhow, Context, Result};
 use lazy_static::lazy_static;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
-use std::{collections::BTreeMap as Map, fs, process};
+use std::{collections::BTreeMap as Map, process};
 
 use crate::utils::profile::Profile;
 
@@ -32,44 +32,6 @@ impl From<Profiles> for Vec<Profile> {
 }
 
 impl Profiles {
-    pub fn write(profile: Profile) -> Result<()> {
-        let mut profiles = Profiles::get_profiles().unwrap_or_default();
-
-        if profile.default {
-            profiles
-                .profiles
-                .values_mut()
-                .for_each(|p| p.default = false);
-        }
-
-        let key = profile.name.as_str();
-        profiles
-            .profiles
-            .entry(key.to_string())
-            .or_insert_with(Profile::default);
-        profiles.profiles.insert(key.to_string(), profile);
-        profiles.save()?;
-        Ok(())
-    }
-
-    pub fn save(&self) -> Result<()> {
-        let profiles_path = home::home_dir().unwrap().join(BEAM_PROFILES_PATH);
-        if !profiles_path.exists() {
-            fs::create_dir_all(profiles_path.parent().unwrap())?;
-            fs::OpenOptions::new()
-                .create(true)
-                .write(true)
-                .open(&profiles_path)?;
-        }
-        let profiles_str = if self.profiles.is_empty() {
-            "".to_string()
-        } else {
-            toml::to_string(&self)?
-        };
-        std::fs::write(profiles_path, profiles_str)?;
-        Ok(())
-    }
-
     pub fn get_profiles() -> Result<Profiles> {
         let profiles_path = home::home_dir().unwrap().join(BEAM_PROFILES_PATH);
         let profiles_str = std::fs::read_to_string(profiles_path)
