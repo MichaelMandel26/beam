@@ -4,7 +4,7 @@ use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::{collections::BTreeMap as Map, fs};
 
-use crate::{command, utils::profile::Profile};
+use crate::utils::profile::Profile;
 
 const BEAM_PROFILES_PATH: &str = ".beam/profiles.toml";
 
@@ -14,7 +14,6 @@ lazy_static! {
         Ok(profile) => profile,
         Err(err) => {
             println!("{err}");
-            command::configure::default::Default::run().unwrap();
             Profiles::get_default().unwrap()
         }
     };

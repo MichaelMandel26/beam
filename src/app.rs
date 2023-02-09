@@ -48,11 +48,9 @@ pub struct App {
 #[derive(Parser, Debug)]
 pub enum Command {
     Connect(command::connect::Connect),
-    Profile(command::profile::Profile),
     #[structopt(alias = "ls")]
     List(command::list::List),
     Completions(command::completions::Completions),
-    Configure(command::configure::Configure),
     Login(command::login::Login),
     Logout(command::logout::Logout),
 }
@@ -76,12 +74,10 @@ impl App {
     pub fn execute_command(&self, context: RuntimeContext) -> Result<()> {
         match &self.cmd {
             Some(Command::Connect(command)) => command.run(context),
-            Some(Command::Profile(command)) => command.run(),
             Some(Command::List(command)) => command.run(context),
             Some(Command::Login(command)) => command.run(context),
             Some(Command::Logout(command)) => command.run(),
             Some(Command::Completions(command)) => command.run(),
-            Some(Command::Configure(command)) => command.run(),
             None => command::default::Default::run(context),
         }
     }
