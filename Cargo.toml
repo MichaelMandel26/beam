@@ -17,7 +17,6 @@ clap = {version = "4.0", features = ["derive"]}
 clap_complete = "4.0"
 clearscreen = "1.0.7"
 colored = "2.0.0"
-dialoguer = "0.10.1"
 home = "0.5.3"
 indicatif = "0.17"
 itertools = "0.10.3"
