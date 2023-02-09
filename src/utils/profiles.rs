@@ -6,7 +6,7 @@ use std::{collections::BTreeMap as Map, process};
 
 use crate::utils::profile::Profile;
 
-const BEAM_PROFILES_PATH: &str = ".beam/profiles.toml";
+const BEAM_PROFILES_PATH: &str = ".config/beam/profiles.toml";
 
 lazy_static! {
     #[derive(Debug, PartialEq, Eq, Default)]
