@@ -142,12 +142,12 @@ mod tests {
                     proxy: "teleport.example.com".into(),
                     cache_ttl: 60,
                     label_whitelist: Some(vec!["test".to_owned()]),
-                    port_forwarding_config: PortForwardingConfig {
+                    port_forwarding_config: Some(PortForwardingConfig {
                         enabled: false,
                         listen_port: None,
                         remote_port: None,
                         remote_host: None,
-                    },
+                    }),
                 },
                 default: true,
                 host_pattern: None,
@@ -161,12 +161,12 @@ mod tests {
                     proxy: "teleport.example2.com".into(),
                     cache_ttl: 60,
                     label_whitelist: Some(vec!["test2".to_owned()]),
-                    port_forwarding_config: PortForwardingConfig {
+                    port_forwarding_config: Some(PortForwardingConfig {
                         enabled: true,
                         listen_port: Some(3306),
                         remote_port: Some(3306),
                         remote_host: Some("127.0.0.1".to_string()),
-                    },
+                    }),
                 },
                 default: false,
                 host_pattern: None,
@@ -182,12 +182,12 @@ mod tests {
                     proxy: "teleport.example.com".into(),
                     cache_ttl: 60,
                     label_whitelist: Some(vec!["test".to_owned()]),
-                    port_forwarding_config: PortForwardingConfig {
+                    port_forwarding_config: Some(PortForwardingConfig {
                         enabled: false,
                         listen_port: None,
                         remote_port: None,
                         remote_host: None,
-                    },
+                    }),
                 },
                 default: true,
                 host_pattern: None,
@@ -201,12 +201,12 @@ mod tests {
                     proxy: "teleport.example2.com".into(),
                     cache_ttl: 60,
                     label_whitelist: Some(vec!["test2".to_owned()]),
-                    port_forwarding_config: PortForwardingConfig {
+                    port_forwarding_config: Some(PortForwardingConfig {
                         enabled: true,
                         listen_port: Some(3306),
                         remote_port: Some(3306),
                         remote_host: Some("127.0.0.1".to_string()),
-                    },
+                    }),
                 },
                 default: true,
                 host_pattern: None,
@@ -230,12 +230,12 @@ mod tests {
                     proxy: "teleport.example.com".into(),
                     cache_ttl: 60,
                     label_whitelist: Some(vec!["test".to_owned()]),
-                    port_forwarding_config: PortForwardingConfig {
+                    port_forwarding_config: Some(PortForwardingConfig {
                         enabled: false,
                         listen_port: None,
                         remote_port: None,
                         remote_host: None,
-                    },
+                    }),
                 },
                 default: true,
                 host_pattern: None,
@@ -249,12 +249,12 @@ mod tests {
                     proxy: "teleport.example2.com".into(),
                     cache_ttl: 60,
                     label_whitelist: Some(vec!["test2".to_owned()]),
-                    port_forwarding_config: PortForwardingConfig {
+                    port_forwarding_config: Some(PortForwardingConfig {
                         enabled: true,
                         listen_port: Some(3306),
                         remote_port: Some(3306),
                         remote_host: Some("127.0.0.1".to_string()),
-                    },
+                    }),
                 },
                 default: false,
                 host_pattern: None,
@@ -277,12 +277,12 @@ mod tests {
                 proxy: "teleport.example.com".into(),
                 cache_ttl: 60,
                 label_whitelist: Some(vec!["test".to_owned()]),
-                port_forwarding_config: PortForwardingConfig {
+                port_forwarding_config: Some(PortForwardingConfig {
                     enabled: true,
                     listen_port: Some(3306),
                     remote_port: Some(3306),
                     remote_host: Some("127.0.0.1".to_string()),
-                },
+                }),
             },
             default: true,
             host_pattern: Some(r#"\b(quality|staging)\b.*"#.to_string()),
@@ -298,12 +298,12 @@ mod tests {
                     proxy: "teleport.example2.com".into(),
                     cache_ttl: 60,
                     label_whitelist: Some(vec!["test2".to_owned()]),
-                    port_forwarding_config: PortForwardingConfig {
+                    port_forwarding_config: Some(PortForwardingConfig {
                         enabled: true,
                         listen_port: Some(3306),
                         remote_port: Some(3306),
                         remote_host: Some("127.0.0.1".to_string()),
-                    },
+                    }),
                 },
                 default: false,
                 host_pattern: Some(r#"\b(dev|prod)\b.*"#.to_string()),
@@ -317,12 +317,12 @@ mod tests {
                     proxy: "teleport.example3.com".into(),
                     cache_ttl: 60,
                     label_whitelist: Some(vec!["test3".to_owned()]),
-                    port_forwarding_config: PortForwardingConfig {
+                    port_forwarding_config: Some(PortForwardingConfig {
                         enabled: true,
                         listen_port: Some(3306),
                         remote_port: Some(3306),
                         remote_host: Some("127.0.0.1".to_string()),
-                    },
+                    }),
                 },
                 default: false,
                 host_pattern: Some(r#"\b(quality|staging)\b.*"#.to_string()),
@@ -336,12 +336,12 @@ mod tests {
                     proxy: "teleport.example4.com".into(),
                     cache_ttl: 60,
                     label_whitelist: Some(vec!["test4".to_owned()]),
-                    port_forwarding_config: PortForwardingConfig {
+                    port_forwarding_config: Some(PortForwardingConfig {
                         enabled: true,
                         listen_port: Some(3306),
                         remote_port: Some(3306),
                         remote_host: Some("127.0.0.1".to_string()),
-                    },
+                    }),
                 },
                 default: false,
                 host_pattern: Some(r#"\b(quality|staging)\b.*"#.to_string()),
@@ -367,12 +367,12 @@ mod tests {
                 proxy: "teleport.example.com".into(),
                 cache_ttl: 60,
                 label_whitelist: Some(vec!["test".to_owned()]),
-                port_forwarding_config: PortForwardingConfig {
+                port_forwarding_config: Some(PortForwardingConfig {
                     enabled: false,
                     listen_port: None,
                     remote_port: None,
                     remote_host: None,
-                },
+                }),
             },
             default: true,
             host_pattern: Some(r#"\b(quality|staging)\b.*"#.to_string()),
@@ -388,12 +388,12 @@ mod tests {
                     proxy: "teleport.example2.com".into(),
                     cache_ttl: 60,
                     label_whitelist: Some(vec!["test".to_owned()]),
-                    port_forwarding_config: PortForwardingConfig {
+                    port_forwarding_config: Some(PortForwardingConfig {
                         enabled: false,
                         listen_port: None,
                         remote_port: None,
                         remote_host: None,
-                    },
+                    }),
                 },
                 default: false,
                 host_pattern: Some(r#"\b(dev|prod)\b.*"#.to_string()),
@@ -421,12 +421,12 @@ mod tests {
                     proxy: "teleport.example.com".into(),
                     cache_ttl: 60,
                     label_whitelist: Some(vec!["test".to_owned()]),
-                    port_forwarding_config: PortForwardingConfig {
+                    port_forwarding_config: Some(PortForwardingConfig {
                         enabled: false,
                         listen_port: None,
                         remote_port: None,
                         remote_host: None,
-                    },
+                    }),
                 },
                 default: true,
                 host_pattern: Some(r#"\b(quality|staging)\b.*"#.to_string()),
@@ -440,12 +440,12 @@ mod tests {
                     proxy: "teleport.example2.com".into(),
                     cache_ttl: 60,
                     label_whitelist: Some(vec!["test".to_owned()]),
-                    port_forwarding_config: PortForwardingConfig {
+                    port_forwarding_config: Some(PortForwardingConfig {
                         enabled: false,
                         listen_port: None,
                         remote_port: None,
                         remote_host: None,
-                    },
+                    }),
                 },
                 default: false,
                 host_pattern: Some(r#"\b(quality|staging)\b.*"#.to_string()),
@@ -470,12 +470,12 @@ mod tests {
                 proxy: "teleport.example.com".into(),
                 cache_ttl: 60,
                 label_whitelist: Some(vec!["test".to_owned()]),
-                port_forwarding_config: PortForwardingConfig {
+                port_forwarding_config: Some(PortForwardingConfig {
                     enabled: false,
                     listen_port: None,
                     remote_port: None,
                     remote_host: None,
-                },
+                }),
             },
             default: false,
             host_pattern: Some(r#"\b(dev|prod)\b.*"#.to_string()),
@@ -501,12 +501,12 @@ mod tests {
                             proxy: "teleport.example.com".into(),
                             cache_ttl: 60,
                             label_whitelist: Some(vec!["test".to_owned()]),
-                            port_forwarding_config: PortForwardingConfig {
+                            port_forwarding_config: Some(PortForwardingConfig {
                                 enabled: false,
                                 listen_port: None,
                                 remote_port: None,
                                 remote_host: None,
-                            },
+                            }),
                         },
                         default: true,
                         host_pattern: Some(r#"\b(quality|staging)\b.*"#.to_string()),
@@ -523,12 +523,12 @@ mod tests {
                             proxy: "teleport.example2.com".into(),
                             cache_ttl: 60,
                             label_whitelist: Some(vec!["test".to_owned()]),
-                            port_forwarding_config: PortForwardingConfig {
+                            port_forwarding_config: Some(PortForwardingConfig {
                                 enabled: false,
                                 listen_port: None,
                                 remote_port: None,
                                 remote_host: None,
-                            },
+                            }),
                         },
                         default: false,
                         host_pattern: Some(r#"\b(quality|staging)\b.*"#.to_string()),
@@ -547,12 +547,12 @@ mod tests {
                     proxy: "teleport.example.com".into(),
                     cache_ttl: 60,
                     label_whitelist: Some(vec!["test".to_owned()]),
-                    port_forwarding_config: PortForwardingConfig {
+                    port_forwarding_config: Some(PortForwardingConfig {
                         enabled: false,
                         listen_port: None,
                         remote_port: None,
                         remote_host: None,
-                    },
+                    }),
                 },
                 default: true,
                 host_pattern: Some(r#"\b(quality|staging)\b.*"#.to_string()),
@@ -566,12 +566,12 @@ mod tests {
                     proxy: "teleport.example2.com".into(),
                     cache_ttl: 60,
                     label_whitelist: Some(vec!["test".to_owned()]),
-                    port_forwarding_config: PortForwardingConfig {
+                    port_forwarding_config: Some(PortForwardingConfig {
                         enabled: false,
                         listen_port: None,
                         remote_port: None,
                         remote_host: None,
-                    },
+                    }),
                 },
                 default: false,
                 host_pattern: Some(r#"\b(quality|staging)\b.*"#.to_string()),
