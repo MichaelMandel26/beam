@@ -8,7 +8,7 @@ pub struct Login {}
 
 impl Login {
     pub fn run(&self, context: RuntimeContext) -> Result<()> {
-        if !cli::is_logged_in()? || !cli::cmp_logged_in_proxy_with(&context.config.proxy)? {
+        if !cli::is_logged_in(&context.config.proxy)? {
             let exit_status = cli::login(
                 &context.config.proxy,
                 context.config.auth,

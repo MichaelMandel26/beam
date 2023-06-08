@@ -4,7 +4,7 @@ use std::process::{Command, ExitStatus};
 
 use crate::utils::spinner;
 
-pub fn is_logged_in() -> Result<bool> {
+pub fn is_logged_in(proxy: &str) -> Result<bool> {
     let output = match Command::new("tsh").args(["status"]).output() {
         Ok(output) => output,
         Err(_) => {
@@ -12,7 +12,7 @@ pub fn is_logged_in() -> Result<bool> {
         }
     };
     let stdout = String::from_utf8_lossy(&output.stdout);
-    let is_logged_in = stdout.contains("valid for");
+    let is_logged_in = stdout.contains("valid for") && stdout.contains(proxy);
     Ok(is_logged_in)
 }
 
@@ -49,24 +49,4 @@ pub fn ls(format: Option<&String>) -> Result<String> {
 
     spinner.finish_and_clear();
     Ok(String::from_utf8_lossy(&output.stdout).to_string())
-}
-
-pub fn cmp_logged_in_proxy_with(proxy: &str) -> Result<bool> {
-    let output = Command::new("tsh").args(["status"]).output()?;
-    let stdout = String::from_utf8_lossy(&output.stdout);
-    let logged_in_proxy = stdout
-        .lines()
-        .next()
-        .unwrap()
-        .split_ascii_whitespace()
-        .nth(3)
-        .unwrap()
-        .split(':')
-        .nth(1)
-        .unwrap()
-        .split("//")
-        .nth(1)
-        .unwrap();
-    let proxy = proxy.split(':').next().unwrap();
-    Ok(proxy == logged_in_proxy)
 }
