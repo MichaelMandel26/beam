@@ -57,7 +57,7 @@ pub enum Command {
 
 impl App {
     pub async fn run(self) -> Result<()> {
-        App::check_for_dot_beam_dir()?;
+        App::check_for_beam_config_dir()?;
         // Asynchronously getting the latest version from GitHub
         let latest_version =
             tokio::spawn(async move { version::get_latest_release(LATEST_RELEASE_URL).await });
@@ -97,9 +97,9 @@ impl App {
         Ok(())
     }
 
-    pub fn check_for_dot_beam_dir() -> Result<()> {
+    pub fn check_for_beam_config_dir() -> Result<()> {
         let home_dir = home::home_dir().expect("Could not find home directory");
-        let dot_beam_dir = home_dir.join(".beam");
+        let dot_beam_dir = home_dir.join(".config/beam");
 
         if !dot_beam_dir.exists() {
             std::fs::create_dir(&dot_beam_dir)?;
@@ -151,7 +151,7 @@ impl App {
 mod tests {
     use super::*;
     #[test]
-    fn test_check_for_dot_beam_dir() {
-        assert!(App::check_for_dot_beam_dir().is_ok());
+    fn test_check_for_beam_config_dir() {
+        assert!(App::check_for_beam_config_dir().is_ok());
     }
 }
