@@ -34,7 +34,6 @@ pub struct RuntimeContextBuilder {
     pub config: Config,
 }
 
-// TODO: maybe write a flasgs builder here
 impl RuntimeContextBuilder {
     pub fn new() -> RuntimeContextBuilder {
         RuntimeContextBuilder::default()

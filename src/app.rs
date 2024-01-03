@@ -1,16 +1,11 @@
 use crate::{
     config::{Config, ConfigVersion},
     context::RuntimeContext,
-    utils::{profile::Profile, profiles::DEFAULT_PROFILE, version}, app,
 };
-use anyhow::{Result, anyhow, bail};
-use clap::{Parser, Error};
-use colored::Colorize;
-use semver::Version;
+use anyhow::Result;
+use clap::Parser;
 
 use crate::command;
-
-const LATEST_RELEASE_URL: &str = "https://github.com/MichaelMandel26/beam/releases/latest";
 
 #[derive(Parser, Debug)]
 #[clap(name = "beam", about = "Easier connection to teleport hosts", version)]
@@ -58,16 +53,8 @@ pub enum Command {
 impl App {
     pub async fn run(self) -> Result<()> {
         App::check_for_beam_config_dir()?;
-        // Asynchronously getting the latest version from GitHub
-        let latest_version =
-            tokio::spawn(async move { version::get_latest_release(LATEST_RELEASE_URL).await });
-
         let context = self.context()?;
-
         self.execute_command(context)?;
-
-        // Printing notification if the latest version is newer than the current version
-        App::check_for_update(latest_version.await?)?;
         Ok(())
     }
 
@@ -80,21 +67,6 @@ impl App {
             Some(Command::Completions(command)) => command.run(),
             None => command::default::Default::run(context),
         }
-    }
-
-    pub fn check_for_update(latest_version: Result<Version>) -> Result<()> {
-        let current_version = version::get_current_version();
-        if let Ok(latest_version) = latest_version {
-            if latest_version > current_version {
-                println!(
-                    "A new version of beam is available {} -> {}\nTo update run {}",
-                    current_version.to_string().red(),
-                    latest_version.to_string().green(),
-                    "cargo install beamcli".green()
-                );
-            }
-        }
-        Ok(())
     }
 
     pub fn check_for_beam_config_dir() -> Result<()> {
@@ -115,7 +87,7 @@ impl App {
             ConfigVersion::V1 => {
                 Config::migrate(ConfigVersion::V1, ConfigVersion::Default);
                 Config::read_default_version()
-            },
+            }
             ConfigVersion::V2 | ConfigVersion::Default => Config::read_default_version(),
             ConfigVersion::None => {
                 // TODO: enhance message here with link to docs
@@ -123,12 +95,12 @@ impl App {
             }
         };
 
-         let runtime_context = RuntimeContext::builder()
-             .with_config(config)
-             .with_app(self)
-             .build();
+        let runtime_context = RuntimeContext::builder()
+            .with_config(config)
+            .with_app(self)
+            .build();
 
-         Ok(runtime_context)
+        Ok(runtime_context)
     }
 }
 
