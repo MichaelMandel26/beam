@@ -118,9 +118,9 @@ impl ConfigVersion {
         // TODO: move to const? Whats best practice?
         match self {
             ConfigVersion::V1 | ConfigVersion::Default | ConfigVersion::None => {
-                home_dir + "~/.beam/profiles.toml"
+                home_dir + "/.beam/profiles.toml"
             }
-            ConfigVersion::V2 => home_dir + "~/.config/beam/profiles.toml",
+            ConfigVersion::V2 => home_dir + "/.config/beam/profiles.toml",
         }
     }
 }
