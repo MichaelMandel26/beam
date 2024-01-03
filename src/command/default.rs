@@ -1,49 +1,31 @@
-use anyhow::{Context, Result};
+use anyhow::Result;
 use clap::Parser;
 
 use crate::ssh;
-use crate::teleport::node::SkimString;
 use crate::teleport::{cli, node};
-use crate::utils::profile::Profile;
-use crate::utils::profiles::{Profiles, DEFAULT_PROFILE};
+use crate::utils::profiles::Profiles;
 use crate::utils::skim;
+use crate::{context::RuntimeContext, teleport::node::SkimString};
 
 #[derive(Debug, Parser)]
 pub struct Default {}
 
 impl Default {
-    pub fn run(beam: &crate::cli::Beam) -> Result<()> {
-        let profile = match &beam.profile.is_some() {
-            true => Profile::get(beam.profile.as_ref().unwrap().as_str())?,
-            false => DEFAULT_PROFILE.clone(),
-        };
-
-        let proxy = match &beam.proxy {
-            Some(proxy) => proxy,
-            None => profile.config.proxy.as_ref().context("No proxy configured to login with. Please use --proxy or configure it using beam configure")?
-        };
-
-        let fallback = whoami::username();
-        let user = match &beam.user {
-            Some(user) => user,
-            None => profile.config.username.as_ref().context("No username configured to login with. Please use --username or configure it using beam configure").unwrap_or(&fallback)
-        };
-
-        let auth = match &beam.auth {
-            Some(auth) => Some(auth),
-            None => profile.config.auth.as_ref(),
-        };
-
-        if !cli::is_logged_in()? || !cli::cmp_logged_in_proxy_with(proxy)? {
-            let exit_status = cli::login(proxy, auth, user)?;
+    pub fn run(context: RuntimeContext) -> Result<()> {
+        if !cli::is_logged_in(&context.config.proxy)? {
+            let exit_status = cli::login(
+                &context.config.proxy,
+                context.config.auth,
+                &context.config.username,
+            )?;
             if !exit_status.success() {
                 return Err(anyhow::anyhow!("Login failed"));
             }
         }
 
-        let nodes = node::get(!beam.clear_cache, proxy)?;
+        let nodes = node::get(!context.flags.clear_cache, &context.config.proxy)?;
 
-        let label_whitelist = profile.config.label_whitelist.clone();
+        let label_whitelist = context.config.label_whitelist.clone();
 
         let items = nodes.to_skim_string(label_whitelist);
 
@@ -62,10 +44,14 @@ impl Default {
             Some(matched_profile) => {
                 let tsh_args = ssh::connect::get_tsh_command(
                     host,
-                    matched_profile.config.username.as_ref().unwrap(),
-                    &matched_profile,
+                    &matched_profile.config.username,
+                    &matched_profile.name,
+                    &matched_profile
+                        .config
+                        .port_forwarding_config
+                        .unwrap_or_default(),
                 )?;
-                if beam.tsh {
+                if context.flags.tsh {
                     println!("{}", tsh_args.join(" "));
                     return Ok(());
                 }
@@ -73,8 +59,13 @@ impl Default {
                 ssh::connect::connect(tsh_args)?
             }
             None => {
-                let tsh_args = ssh::connect::get_tsh_command(host, user, &profile)?;
-                if beam.tsh {
+                let tsh_args = ssh::connect::get_tsh_command(
+                    host,
+                    &context.config.username,
+                    &context.meta.profile_name,
+                    &context.config.port_forwarding_config.unwrap_or_default(),
+                )?;
+                if context.flags.tsh {
                     println!("{}", tsh_args.join(" "));
                     return Ok(());
                 }

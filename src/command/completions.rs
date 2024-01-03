@@ -1,6 +1,6 @@
 use std::io;
 
-use crate::cli::Beam;
+use crate::app::App;
 use anyhow::{anyhow, Result};
 use clap::{CommandFactory, Parser};
 use clap_complete::{generate, Shell};
@@ -13,7 +13,7 @@ pub struct Completions {
 
 impl Completions {
     pub fn run(&self) -> Result<()> {
-        let cmd = &mut Beam::command();
+        let cmd = &mut App::command();
         match self.shell.as_str() {
             "bash" => {
                 generate(

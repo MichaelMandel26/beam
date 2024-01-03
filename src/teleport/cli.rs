@@ -4,7 +4,7 @@ use std::process::{Command, ExitStatus};
 
 use crate::utils::spinner;
 
-pub fn is_logged_in() -> Result<bool> {
+pub fn is_logged_in(proxy: &str) -> Result<bool> {
     let output = match Command::new("tsh").args(["status"]).output() {
         Ok(output) => output,
         Err(_) => {
@@ -12,15 +12,15 @@ pub fn is_logged_in() -> Result<bool> {
         }
     };
     let stdout = String::from_utf8_lossy(&output.stdout);
-    let is_logged_in = stdout.contains("valid for");
+    let is_logged_in = stdout.contains("valid for") && stdout.contains(proxy);
     Ok(is_logged_in)
 }
 
-pub fn login(proxy: &str, auth: Option<&String>, user: &str) -> Result<ExitStatus> {
-    let proxy_args = format!("--proxy={}", proxy);
+pub fn login(proxy: &str, auth: Option<String>, user: &str) -> Result<ExitStatus> {
+    let proxy_args = format!("--proxy={proxy}");
     let mut args = vec!["login", proxy_args.as_str()];
 
-    let user_args = format!("--user={}", user);
+    let user_args = format!("--user={user}");
     args.push(user_args.as_str());
 
     let auth_args;
@@ -34,7 +34,7 @@ pub fn login(proxy: &str, auth: Option<&String>, user: &str) -> Result<ExitStatu
 }
 
 pub fn logout() -> Result<ExitStatus> {
-    let mut process = Command::new("tsh").args(&["logout"]).spawn()?;
+    let mut process = Command::new("tsh").args(["logout"]).spawn()?;
     process.wait().map_err(|e| anyhow::anyhow!(e))
 }
 
@@ -49,24 +49,4 @@ pub fn ls(format: Option<&String>) -> Result<String> {
 
     spinner.finish_and_clear();
     Ok(String::from_utf8_lossy(&output.stdout).to_string())
-}
-
-pub fn cmp_logged_in_proxy_with(proxy: &str) -> Result<bool> {
-    let output = Command::new("tsh").args(["status"]).output()?;
-    let stdout = String::from_utf8_lossy(&output.stdout);
-    let logged_in_proxy = stdout
-        .lines()
-        .next()
-        .unwrap()
-        .split_ascii_whitespace()
-        .nth(3)
-        .unwrap()
-        .split(':')
-        .nth(1)
-        .unwrap()
-        .split("//")
-        .nth(1)
-        .unwrap();
-    let proxy = proxy.split(':').next().unwrap();
-    Ok(proxy == logged_in_proxy)
 }

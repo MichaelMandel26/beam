@@ -1,6 +1,5 @@
 use anyhow::Result;
 use clap::Parser;
-use colored::Colorize;
 
 use crate::teleport::cli;
 
@@ -9,11 +8,7 @@ pub struct Logout {}
 
 impl Logout {
     pub fn run(&self) -> Result<()> {
-        if cli::is_logged_in()? {
-            cli::logout()?;
-        } else {
-            println!("{}", "You are not logged in with any proxy".red());
-        }
+        cli::logout()?;
 
         Ok(())
     }

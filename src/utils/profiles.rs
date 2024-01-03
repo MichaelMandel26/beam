@@ -2,19 +2,19 @@ use anyhow::{anyhow, Context, Result};
 use lazy_static::lazy_static;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
-use std::{collections::BTreeMap as Map, fs};
+use std::{collections::BTreeMap as Map, process};
 
 use crate::utils::profile::Profile;
 
-const BEAM_PROFILES_PATH: &str = ".beam/profiles.toml";
+const BEAM_PROFILES_PATH: &str = ".config/beam/profiles.toml";
 
 lazy_static! {
     #[derive(Debug, PartialEq, Eq, Default)]
     pub static ref DEFAULT_PROFILE: Profile = match Profiles::get_default() {
         Ok(profile) => profile,
         Err(err) => {
-            println!("{}", err);
-            Profiles::get_default().unwrap()
+            println!("{err}");
+            process::exit(0)
         }
     };
 }
@@ -27,53 +27,11 @@ pub struct Profiles {
 
 impl From<Profiles> for Vec<Profile> {
     fn from(profiles: Profiles) -> Self {
-        profiles
-            .profiles
-            .into_iter()
-            .map(|(_, v)| v)
-            .collect::<Vec<Profile>>()
+        profiles.profiles.into_values().collect::<Vec<Profile>>()
     }
 }
 
 impl Profiles {
-    pub fn write(profile: Profile) -> Result<()> {
-        let mut profiles = Profiles::get_profiles().unwrap_or_default();
-
-        if profile.default {
-            profiles
-                .profiles
-                .values_mut()
-                .for_each(|p| p.default = false);
-        }
-
-        let key = profile.name.as_str();
-        profiles
-            .profiles
-            .entry(key.to_string())
-            .or_insert_with(Profile::default);
-        profiles.profiles.insert(key.to_string(), profile);
-        profiles.save()?;
-        Ok(())
-    }
-
-    pub fn save(&self) -> Result<()> {
-        let profiles_path = home::home_dir().unwrap().join(BEAM_PROFILES_PATH);
-        if !profiles_path.exists() {
-            fs::create_dir_all(profiles_path.parent().unwrap())?;
-            fs::OpenOptions::new()
-                .create(true)
-                .write(true)
-                .open(&profiles_path)?;
-        }
-        let profiles_str = if self.profiles.is_empty() {
-            "".to_string()
-        } else {
-            toml::to_string(&self)?
-        };
-        std::fs::write(profiles_path, profiles_str)?;
-        Ok(())
-    }
-
     pub fn get_profiles() -> Result<Profiles> {
         let profiles_path = home::home_dir().unwrap().join(BEAM_PROFILES_PATH);
         let profiles_str = std::fs::read_to_string(profiles_path)
@@ -168,7 +126,7 @@ impl Profiles {
 
 #[cfg(test)]
 mod tests {
-    use crate::utils::config::Config;
+    use crate::config::{Config, PortForwardingConfig};
 
     use super::*;
 
@@ -179,15 +137,17 @@ mod tests {
                 name: "test".to_owned(),
                 priority: Some(0),
                 config: Config {
-                    username: Some("test".to_owned()),
+                    username: "test".into(),
                     auth: Some("test".to_owned()),
-                    proxy: Some("test".to_owned()),
-                    cache_ttl: Some(60),
+                    proxy: "teleport.example.com".into(),
+                    cache_ttl: 60,
                     label_whitelist: Some(vec!["test".to_owned()]),
-                    enable_port_forwarding: Some(false),
-                    listen_port: None,
-                    remote_port: None,
-                    remote_host: None,
+                    port_forwarding_config: Some(PortForwardingConfig {
+                        enabled: false,
+                        listen_port: None,
+                        remote_port: None,
+                        remote_host: None,
+                    }),
                 },
                 default: true,
                 host_pattern: None,
@@ -196,15 +156,17 @@ mod tests {
                 name: "test2".to_owned(),
                 priority: Some(1),
                 config: Config {
-                    username: Some("test2".to_owned()),
+                    username: "test2".into(),
                     auth: Some("test2".to_owned()),
-                    proxy: Some("test2".to_owned()),
-                    cache_ttl: Some(60),
+                    proxy: "teleport.example2.com".into(),
+                    cache_ttl: 60,
                     label_whitelist: Some(vec!["test2".to_owned()]),
-                    enable_port_forwarding: Some(true),
-                    listen_port: Some(3306),
-                    remote_port: Some(3306),
-                    remote_host: Some("127.0.0.1".to_string()),
+                    port_forwarding_config: Some(PortForwardingConfig {
+                        enabled: true,
+                        listen_port: Some(3306),
+                        remote_port: Some(3306),
+                        remote_host: Some("127.0.0.1".to_string()),
+                    }),
                 },
                 default: false,
                 host_pattern: None,
@@ -215,15 +177,17 @@ mod tests {
                 name: "test".to_owned(),
                 priority: Some(1),
                 config: Config {
-                    username: Some("test".to_owned()),
+                    username: "test".into(),
                     auth: Some("test".to_owned()),
-                    proxy: Some("test".to_owned()),
-                    cache_ttl: Some(60),
+                    proxy: "teleport.example.com".into(),
+                    cache_ttl: 60,
                     label_whitelist: Some(vec!["test".to_owned()]),
-                    enable_port_forwarding: Some(false),
-                    listen_port: None,
-                    remote_port: None,
-                    remote_host: None,
+                    port_forwarding_config: Some(PortForwardingConfig {
+                        enabled: false,
+                        listen_port: None,
+                        remote_port: None,
+                        remote_host: None,
+                    }),
                 },
                 default: true,
                 host_pattern: None,
@@ -232,15 +196,17 @@ mod tests {
                 name: "test2".to_owned(),
                 priority: Some(0),
                 config: Config {
-                    username: Some("test2".to_owned()),
+                    username: "test2".into(),
                     auth: Some("test2".to_owned()),
-                    proxy: Some("test2".to_owned()),
-                    cache_ttl: Some(60),
+                    proxy: "teleport.example2.com".into(),
+                    cache_ttl: 60,
                     label_whitelist: Some(vec!["test2".to_owned()]),
-                    enable_port_forwarding: Some(true),
-                    listen_port: Some(3306),
-                    remote_port: Some(3306),
-                    remote_host: Some("127.0.0.1".to_string()),
+                    port_forwarding_config: Some(PortForwardingConfig {
+                        enabled: true,
+                        listen_port: Some(3306),
+                        remote_port: Some(3306),
+                        remote_host: Some("127.0.0.1".to_string()),
+                    }),
                 },
                 default: true,
                 host_pattern: None,
@@ -259,15 +225,17 @@ mod tests {
                 name: "test".to_owned(),
                 priority: Some(1),
                 config: Config {
-                    username: Some("test".to_owned()),
+                    username: "test".into(),
                     auth: Some("test".to_owned()),
-                    proxy: Some("test".to_owned()),
-                    cache_ttl: Some(60),
+                    proxy: "teleport.example.com".into(),
+                    cache_ttl: 60,
                     label_whitelist: Some(vec!["test".to_owned()]),
-                    enable_port_forwarding: Some(false),
-                    listen_port: None,
-                    remote_port: None,
-                    remote_host: None,
+                    port_forwarding_config: Some(PortForwardingConfig {
+                        enabled: false,
+                        listen_port: None,
+                        remote_port: None,
+                        remote_host: None,
+                    }),
                 },
                 default: true,
                 host_pattern: None,
@@ -276,15 +244,17 @@ mod tests {
                 name: "test2".to_owned(),
                 priority: Some(0),
                 config: Config {
-                    username: Some("test2".to_owned()),
+                    username: "test2".into(),
                     auth: Some("test2".to_owned()),
-                    proxy: Some("test2".to_owned()),
-                    cache_ttl: Some(60),
+                    proxy: "teleport.example2.com".into(),
+                    cache_ttl: 60,
                     label_whitelist: Some(vec!["test2".to_owned()]),
-                    enable_port_forwarding: Some(false),
-                    listen_port: None,
-                    remote_port: None,
-                    remote_host: None,
+                    port_forwarding_config: Some(PortForwardingConfig {
+                        enabled: true,
+                        listen_port: Some(3306),
+                        remote_port: Some(3306),
+                        remote_host: Some("127.0.0.1".to_string()),
+                    }),
                 },
                 default: false,
                 host_pattern: None,
@@ -302,15 +272,17 @@ mod tests {
             name: "test".to_owned(),
             priority: Some(0),
             config: Config {
-                username: Some("test".to_owned()),
+                username: "test".into(),
                 auth: Some("test".to_owned()),
-                proxy: Some("test".to_owned()),
-                cache_ttl: Some(60),
+                proxy: "teleport.example.com".into(),
+                cache_ttl: 60,
                 label_whitelist: Some(vec!["test".to_owned()]),
-                enable_port_forwarding: Some(false),
-                listen_port: None,
-                remote_port: None,
-                remote_host: None,
+                port_forwarding_config: Some(PortForwardingConfig {
+                    enabled: true,
+                    listen_port: Some(3306),
+                    remote_port: Some(3306),
+                    remote_host: Some("127.0.0.1".to_string()),
+                }),
             },
             default: true,
             host_pattern: Some(r#"\b(quality|staging)\b.*"#.to_string()),
@@ -321,15 +293,17 @@ mod tests {
                 name: "test2".to_owned(),
                 priority: Some(0),
                 config: Config {
-                    username: Some("test2".to_owned()),
+                    username: "test2".into(),
                     auth: Some("test2".to_owned()),
-                    proxy: Some("test2".to_owned()),
-                    cache_ttl: Some(60),
+                    proxy: "teleport.example2.com".into(),
+                    cache_ttl: 60,
                     label_whitelist: Some(vec!["test2".to_owned()]),
-                    enable_port_forwarding: Some(false),
-                    listen_port: None,
-                    remote_port: None,
-                    remote_host: None,
+                    port_forwarding_config: Some(PortForwardingConfig {
+                        enabled: true,
+                        listen_port: Some(3306),
+                        remote_port: Some(3306),
+                        remote_host: Some("127.0.0.1".to_string()),
+                    }),
                 },
                 default: false,
                 host_pattern: Some(r#"\b(dev|prod)\b.*"#.to_string()),
@@ -338,15 +312,17 @@ mod tests {
                 name: "test3".to_owned(),
                 priority: Some(1),
                 config: Config {
-                    username: Some("test3".to_owned()),
+                    username: "test3".into(),
                     auth: Some("test3".to_owned()),
-                    proxy: Some("test3".to_owned()),
-                    cache_ttl: Some(60),
+                    proxy: "teleport.example3.com".into(),
+                    cache_ttl: 60,
                     label_whitelist: Some(vec!["test3".to_owned()]),
-                    enable_port_forwarding: Some(false),
-                    listen_port: None,
-                    remote_port: None,
-                    remote_host: None,
+                    port_forwarding_config: Some(PortForwardingConfig {
+                        enabled: true,
+                        listen_port: Some(3306),
+                        remote_port: Some(3306),
+                        remote_host: Some("127.0.0.1".to_string()),
+                    }),
                 },
                 default: false,
                 host_pattern: Some(r#"\b(quality|staging)\b.*"#.to_string()),
@@ -355,15 +331,17 @@ mod tests {
                 name: "test4".to_owned(),
                 priority: None,
                 config: Config {
-                    username: Some("test4".to_owned()),
+                    username: "test4".into(),
                     auth: Some("test4".to_owned()),
-                    proxy: Some("test4".to_owned()),
-                    cache_ttl: Some(60),
+                    proxy: "teleport.example4.com".into(),
+                    cache_ttl: 60,
                     label_whitelist: Some(vec!["test4".to_owned()]),
-                    enable_port_forwarding: Some(false),
-                    listen_port: None,
-                    remote_port: None,
-                    remote_host: None,
+                    port_forwarding_config: Some(PortForwardingConfig {
+                        enabled: true,
+                        listen_port: Some(3306),
+                        remote_port: Some(3306),
+                        remote_host: Some("127.0.0.1".to_string()),
+                    }),
                 },
                 default: false,
                 host_pattern: Some(r#"\b(quality|staging)\b.*"#.to_string()),
@@ -384,15 +362,17 @@ mod tests {
             name: "test".to_owned(),
             priority: None,
             config: Config {
-                username: Some("test".to_owned()),
+                username: "test".into(),
                 auth: Some("test".to_owned()),
-                proxy: Some("test".to_owned()),
-                cache_ttl: Some(60),
+                proxy: "teleport.example.com".into(),
+                cache_ttl: 60,
                 label_whitelist: Some(vec!["test".to_owned()]),
-                enable_port_forwarding: Some(false),
-                listen_port: None,
-                remote_port: None,
-                remote_host: None,
+                port_forwarding_config: Some(PortForwardingConfig {
+                    enabled: false,
+                    listen_port: None,
+                    remote_port: None,
+                    remote_host: None,
+                }),
             },
             default: true,
             host_pattern: Some(r#"\b(quality|staging)\b.*"#.to_string()),
@@ -403,15 +383,17 @@ mod tests {
                 name: "test2".to_owned(),
                 priority: None,
                 config: Config {
-                    username: Some("test2".to_owned()),
+                    username: "test2".into(),
                     auth: Some("test2".to_owned()),
-                    proxy: Some("test2".to_owned()),
-                    cache_ttl: Some(60),
-                    label_whitelist: Some(vec!["test2".to_owned()]),
-                    enable_port_forwarding: Some(false),
-                    listen_port: None,
-                    remote_port: None,
-                    remote_host: None,
+                    proxy: "teleport.example2.com".into(),
+                    cache_ttl: 60,
+                    label_whitelist: Some(vec!["test".to_owned()]),
+                    port_forwarding_config: Some(PortForwardingConfig {
+                        enabled: false,
+                        listen_port: None,
+                        remote_port: None,
+                        remote_host: None,
+                    }),
                 },
                 default: false,
                 host_pattern: Some(r#"\b(dev|prod)\b.*"#.to_string()),
@@ -434,15 +416,17 @@ mod tests {
                 name: "test".to_owned(),
                 priority: None,
                 config: Config {
-                    username: Some("test".to_owned()),
+                    username: "test".into(),
                     auth: Some("test".to_owned()),
-                    proxy: Some("test".to_owned()),
-                    cache_ttl: Some(60),
+                    proxy: "teleport.example.com".into(),
+                    cache_ttl: 60,
                     label_whitelist: Some(vec!["test".to_owned()]),
-                    enable_port_forwarding: Some(false),
-                    listen_port: None,
-                    remote_port: None,
-                    remote_host: None,
+                    port_forwarding_config: Some(PortForwardingConfig {
+                        enabled: false,
+                        listen_port: None,
+                        remote_port: None,
+                        remote_host: None,
+                    }),
                 },
                 default: true,
                 host_pattern: Some(r#"\b(quality|staging)\b.*"#.to_string()),
@@ -451,15 +435,17 @@ mod tests {
                 name: "test2".to_owned(),
                 priority: None,
                 config: Config {
-                    username: Some("test2".to_owned()),
+                    username: "test2".into(),
                     auth: Some("test2".to_owned()),
-                    proxy: Some("test2".to_owned()),
-                    cache_ttl: Some(60),
-                    label_whitelist: Some(vec!["test2".to_owned()]),
-                    enable_port_forwarding: Some(false),
-                    listen_port: None,
-                    remote_port: None,
-                    remote_host: None,
+                    proxy: "teleport.example2.com".into(),
+                    cache_ttl: 60,
+                    label_whitelist: Some(vec!["test".to_owned()]),
+                    port_forwarding_config: Some(PortForwardingConfig {
+                        enabled: false,
+                        listen_port: None,
+                        remote_port: None,
+                        remote_host: None,
+                    }),
                 },
                 default: false,
                 host_pattern: Some(r#"\b(quality|staging)\b.*"#.to_string()),
@@ -479,15 +465,17 @@ mod tests {
             name: "test".to_owned(),
             priority: None,
             config: Config {
-                username: Some("test".to_owned()),
+                username: "test".into(),
                 auth: Some("test".to_owned()),
-                proxy: Some("test".to_owned()),
-                cache_ttl: Some(60),
+                proxy: "teleport.example.com".into(),
+                cache_ttl: 60,
                 label_whitelist: Some(vec!["test".to_owned()]),
-                enable_port_forwarding: Some(false),
-                listen_port: None,
-                remote_port: None,
-                remote_host: None,
+                port_forwarding_config: Some(PortForwardingConfig {
+                    enabled: false,
+                    listen_port: None,
+                    remote_port: None,
+                    remote_host: None,
+                }),
             },
             default: false,
             host_pattern: Some(r#"\b(dev|prod)\b.*"#.to_string()),
@@ -508,15 +496,17 @@ mod tests {
                         name: "test".to_owned(),
                         priority: Some(0),
                         config: Config {
-                            username: Some("test".to_owned()),
+                            username: "test".into(),
                             auth: Some("test".to_owned()),
-                            proxy: Some("test".to_owned()),
-                            cache_ttl: Some(60),
+                            proxy: "teleport.example.com".into(),
+                            cache_ttl: 60,
                             label_whitelist: Some(vec!["test".to_owned()]),
-                            enable_port_forwarding: Some(false),
-                            listen_port: None,
-                            remote_port: None,
-                            remote_host: None,
+                            port_forwarding_config: Some(PortForwardingConfig {
+                                enabled: false,
+                                listen_port: None,
+                                remote_port: None,
+                                remote_host: None,
+                            }),
                         },
                         default: true,
                         host_pattern: Some(r#"\b(quality|staging)\b.*"#.to_string()),
@@ -528,15 +518,17 @@ mod tests {
                         name: "test2".to_owned(),
                         priority: Some(0),
                         config: Config {
-                            username: Some("test2".to_owned()),
+                            username: "test2".into(),
                             auth: Some("test2".to_owned()),
-                            proxy: Some("test2".to_owned()),
-                            cache_ttl: Some(60),
-                            label_whitelist: Some(vec!["test2".to_owned()]),
-                            enable_port_forwarding: Some(false),
-                            listen_port: None,
-                            remote_port: None,
-                            remote_host: None,
+                            proxy: "teleport.example2.com".into(),
+                            cache_ttl: 60,
+                            label_whitelist: Some(vec!["test".to_owned()]),
+                            port_forwarding_config: Some(PortForwardingConfig {
+                                enabled: false,
+                                listen_port: None,
+                                remote_port: None,
+                                remote_host: None,
+                            }),
                         },
                         default: false,
                         host_pattern: Some(r#"\b(quality|staging)\b.*"#.to_string()),
@@ -550,15 +542,17 @@ mod tests {
                 name: "test".to_owned(),
                 priority: Some(0),
                 config: Config {
-                    username: Some("test".to_owned()),
+                    username: "test".into(),
                     auth: Some("test".to_owned()),
-                    proxy: Some("test".to_owned()),
-                    cache_ttl: Some(60),
+                    proxy: "teleport.example.com".into(),
+                    cache_ttl: 60,
                     label_whitelist: Some(vec!["test".to_owned()]),
-                    enable_port_forwarding: Some(false),
-                    listen_port: None,
-                    remote_port: None,
-                    remote_host: None,
+                    port_forwarding_config: Some(PortForwardingConfig {
+                        enabled: false,
+                        listen_port: None,
+                        remote_port: None,
+                        remote_host: None,
+                    }),
                 },
                 default: true,
                 host_pattern: Some(r#"\b(quality|staging)\b.*"#.to_string()),
@@ -567,15 +561,17 @@ mod tests {
                 name: "test2".to_owned(),
                 priority: Some(0),
                 config: Config {
-                    username: Some("test2".to_owned()),
+                    username: "test2".into(),
                     auth: Some("test2".to_owned()),
-                    proxy: Some("test2".to_owned()),
-                    cache_ttl: Some(60),
-                    label_whitelist: Some(vec!["test2".to_owned()]),
-                    enable_port_forwarding: Some(false),
-                    listen_port: None,
-                    remote_port: None,
-                    remote_host: None,
+                    proxy: "teleport.example2.com".into(),
+                    cache_ttl: 60,
+                    label_whitelist: Some(vec!["test".to_owned()]),
+                    port_forwarding_config: Some(PortForwardingConfig {
+                        enabled: false,
+                        listen_port: None,
+                        remote_port: None,
+                        remote_host: None,
+                    }),
                 },
                 default: false,
                 host_pattern: Some(r#"\b(quality|staging)\b.*"#.to_string()),
