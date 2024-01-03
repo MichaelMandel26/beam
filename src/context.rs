@@ -56,7 +56,7 @@ impl RuntimeContextBuilder {
         self
     }
 
-    pub fn config(mut self, config: Config) -> Self {
+    pub fn with_config(mut self, config: Config) -> Self {
         self.config = config;
         self
     }

@@ -1,10 +1,10 @@
 use crate::{
-    config::Config,
+    config::{Config, ConfigVersion},
     context::RuntimeContext,
-    utils::{profile::Profile, profiles::DEFAULT_PROFILE, version},
+    utils::{profile::Profile, profiles::DEFAULT_PROFILE, version}, app,
 };
-use anyhow::Result;
-use clap::Parser;
+use anyhow::{Result, anyhow, bail};
+use clap::{Parser, Error};
 use colored::Colorize;
 use semver::Version;
 
@@ -109,40 +109,26 @@ impl App {
     }
 
     fn context(&self) -> Result<RuntimeContext> {
-        let profile = match &self.profile.is_some() {
-            true => Profile::get(self.profile.as_ref().unwrap().as_str())?,
-            false => DEFAULT_PROFILE.clone(),
+        let config_version = Config::find_current_version();
+
+        let config = match config_version {
+            ConfigVersion::V1 => {
+                Config::migrate(ConfigVersion::V1, ConfigVersion::Default);
+                Config::read_default_version()
+            },
+            ConfigVersion::V2 | ConfigVersion::Default => Config::read_default_version(),
+            ConfigVersion::None => {
+                // TODO: enhance message here with link to docs
+                anyhow::bail!("Could not find any config file")
+            }
         };
 
-        let username = self.user.as_ref().unwrap_or(&profile.config.username);
-        let proxy = self.proxy.as_ref().unwrap_or(&profile.config.proxy);
-        let cache_ttl = profile.config.cache_ttl;
-        let port_forwarding_config = profile.config.port_forwarding_config;
+         let runtime_context = RuntimeContext::builder()
+             .with_config(config)
+             .with_app(self)
+             .build();
 
-        let mut config_builder = Config::builder()
-            .username(username)
-            .proxy(proxy)
-            .cache_ttl(cache_ttl)
-            .port_forwarding_config(port_forwarding_config.unwrap_or_default());
-
-        let auth = match self.auth {
-            Some(_) => self.auth.clone(),
-            None => profile.config.auth,
-        };
-
-        if let Some(auth) = auth {
-            config_builder = config_builder.auth(auth);
-        }
-
-        let config = config_builder.build();
-
-        let runtime_context = RuntimeContext::builder()
-            .config(config)
-            .with_app(self)
-            .profile_name(profile.name)
-            .build();
-
-        Ok(runtime_context)
+         Ok(runtime_context)
     }
 }
 

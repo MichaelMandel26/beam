@@ -92,11 +92,7 @@ impl Config {
         ConfigVersion::None
     }
 
-    pub fn read_default_version() -> Config {
-        todo!()
-    }
-
-    pub fn migrate(from: ConfigVersion, to: ConfigVersion) {
+    pub fn read_from(path: impl Into<PathBuf>) -> Config {
         todo!()
     }
 }
