@@ -138,8 +138,7 @@ impl App {
 
         let runtime_context = RuntimeContext::builder()
             .config(config)
-            .tsh(self.tsh)
-            .clear_cache(self.clear_cache)
+            .with_app(self)
             .profile_name(profile.name)
             .build();
 

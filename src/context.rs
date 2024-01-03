@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::config::Config;
+use crate::{config::Config, app::App};
 
 #[derive(Debug, Serialize, Deserialize, Default, PartialEq)]
 pub struct RuntimeFlags {
@@ -38,6 +38,12 @@ pub struct RuntimeContextBuilder {
 impl RuntimeContextBuilder {
     pub fn new() -> RuntimeContextBuilder {
         RuntimeContextBuilder::default()
+    }
+
+    pub fn with_app(mut self, app: &App) -> Self {
+        self.flags.clear_cache = app.clear_cache;
+        self.flags.tsh = app.tsh;
+        self
     }
 
     pub fn clear_cache(mut self, clear_cache: bool) -> Self {
